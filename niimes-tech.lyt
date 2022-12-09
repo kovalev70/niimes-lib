@@ -5,7 +5,7 @@
  <group/>
  <dbu>0.5</dbu>
  <base-path/>
- <original-base-path>C:\Users\hairulinde\KLayout\tech\niimes-tech</original-base-path>
+ <original-base-path>C:\Users\kovalevvv\KLayout\tech\niimes-tech</original-base-path>
  <layer-properties_file>layer_properties\PcellsLayers.lyp</layer-properties_file>
  <add-other-layers>true</add-other-layers>
  <reader-options>
