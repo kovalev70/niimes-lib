@@ -59,13 +59,13 @@ class MSR(pya.PCellDeclarationHelper):
                     pya.Point(1800*self.length,self.width*100),pya.Point(self.length*1000,self.width*100),pya.Point(self.length*1000,0)]
         
         self.cell.shapes(self.mesa_layer).insert(pya.Polygon(pts_mesa))
-        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*100,self.width*100,self.length*900,self.width*1100))
-        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*1900,self.width*100,self.length*2700,self.width*1100))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(1000,1000,self.length*1000-1000,self.width*1200-1000))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*1800+1000,1000,self.length*2800-1000,self.width*1200-1000))
         
-        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*200,self.width*200,self.length*800,self.width*1000))
-        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*2000,self.width*200,self.length*2600,self.width*1000))
+        self.cell.shapes(self.met1_layer).insert(pya.Box(2000,2000,self.length*1000-2000,self.width*1200-2000))
+        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*1800+2000,2000,self.length*2800-2000,self.width*1200-2000))
         
-        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*250,self.width*250,self.length*750,self.width*950))
-        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*2050,self.width*250,self.length*2550,self.width*950))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(2500,2500,self.length*1000-2500,self.width*1200-2500))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*1800+2500, 2500, self.length*2800-2500, self.width*1200-2500))
 </text>
 </klayout-macro>
