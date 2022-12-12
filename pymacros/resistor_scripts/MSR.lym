@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya 
+
+class MSR(pya.PCellDeclarationHelper):
+    
+    def __init__(self):
+        
+        super(MSR, self).__init__()
+        
+        self.mesa = pya.LayerInfo(40, 2, "Mesa")
+        self.ohmic = pya.LayerInfo(20, 1, "Ohmic")
+        self.via1 = pya.LayerInfo(70, 6, "Via1")
+        self.met1 = pya.LayerInfo(91, 10, "Met1")
+        
+        self.param("mesa", self.TypeLayer, "Layer of Mesa", default=self.mesa, hidden=True)
+        self.param("ohmic", self.TypeLayer, "Layer of Ohmic", default=self.ohmic, hidden=True)
+        self.param("via1", self.TypeLayer, "Layer of Via1", default=self.via1, hidden=True)
+        self.param("met1", self.TypeLayer, "Layer of Met1", default=self.met1, hidden=True)
+          
+        self.param("width", self.TypeDouble, "Ширина резистора", default=10)
+        self.param("length", self.TypeDouble, "Длина резистора", default=10)
+        
+    def display_text_impl(self):
+
+        return (f'SUBCKT\n'
+                f'ID=R4\n'
+                f'NET="MSR"\n'
+                f'W={self.width}\n'
+                f'L={self.length}')
+
+    def coerce_parameters_impl(self):
+
+        if (self.width &lt; 10  or self.width &gt; 300 ): 
+            raise(RuntimeError("Ширина должна быть больше 10 мкм и меньше 300 мкм"))
+        
+        if(self.length &lt; 10 or self.length &gt; 300):
+            raise(RuntimeError("Длина должна быть больше 10 мкм и меньше 300 мкм"))
+      
+    def produce_impl(self):
+        
+        pts_mesa = [pya.Point(0,0),pya.Point(0,self.width*1200),pya.Point(self.length*1000,self.width*1200),
+                    pya.Point(self.length*1000,self.width*1100),pya.Point(1800*self.length,self.width*1100),pya.Point(1800*self.length,self.width*1200),
+                    pya.Point(2800*self.length,self.width*1200),pya.Point(2800*self.length,0),pya.Point(1800*self.length,0),
+                    pya.Point(1800*self.length,self.width*100),pya.Point(self.length*1000,self.width*100),pya.Point(self.length*1000,0)]
+        
+        self.cell.shapes(self.mesa_layer).insert(pya.Polygon(pts_mesa))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*100,self.width*100,self.length*900,self.width*1100))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*1900,self.width*100,self.length*2700,self.width*1100))
+        
+        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*200,self.width*200,self.length*800,self.width*1000))
+        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*2000,self.width*200,self.length*2600,self.width*1000))
+        
+        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*250,self.width*250,self.length*750,self.width*950))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*2050,self.width*250,self.length*2550,self.width*950))
+</text>
+</klayout-macro>
