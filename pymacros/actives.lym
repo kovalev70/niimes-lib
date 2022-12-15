@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>class Actives(pya.Library):
+
+  def __init__(self):
+  
+    self.description = "Сюда нужно добавить описание"
+    
+    self.layout().register_pcell("VT4", VT4())
+
+    self.register("Actives")
+Actives()
+</text>
+</klayout-macro>

@@ -37,11 +37,7 @@ class MSR(pya.PCellDeclarationHelper):
         
     def display_text_impl(self):
 
-        return (f'SUBCKT\n'
-                f'ID=R4\n'
-                f'NET="MSR"\n'
-                f'W={self.width}\n'
-                f'L={self.length}')
+        return (f'SUBCKT | ID=R4 | NET="MSR" | W={self.width} | L={self.length}')
 
     def coerce_parameters_impl(self):
 

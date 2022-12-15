@@ -3,9 +3,9 @@
  <name>niimes-tech</name>
  <description/>
  <group/>
- <dbu>0.5</dbu>
+ <dbu>0.05</dbu>
  <base-path/>
- <original-base-path></original-base-path>
+ <original-base-path>C:\Users\hairulinde\KLayout\tech\niimes-tech</original-base-path>
  <layer-properties_file>layer_properties\PcellsLayers.lyp</layer-properties_file>
  <add-other-layers>true</add-other-layers>
  <reader-options>
@@ -154,53 +154,22 @@
   </mag>
  </writer-options>
  <d25>
-  <src># Provide z stack information here
-#
-# Each line is one layer. The specification consists of a layer specification, a colon and arguments.
-# The arguments are named (like "x=...") or in serial. Parameters are separated by comma or blanks.
-# Named arguments are:
-#
-#   zstart   The lower z position of the extruded layer in µm
-#   zstop    The upper z position of the extruded layer in µm
-#   height   The height of the extruded layer in µm
-#
-# 'height', 'zstart' and 'zstop' can be used in any combination. If no value is given for 'zstart',
-# the upper level of the previous layer will be used.
-#
-# If a single unnamed parameter is given, it corresponds to 'height'. Two parameters correspond to
-# 'zstart' and 'zstop'.
-#
-# Examples:
-#   1: 0.5 1.5                    # extrude layer 1/0 from 0.5 to 1.5 vertically
-#   1/0: 0.5 1.5                  # same with explicit datatype
-#   1: zstop=1.5, zstart=0.5      # same with named parameters
-#   1: height=1.0, zstop=1.5      # same with z stop minus height
-#   1: 1.0 zstop=1.5              # same with height as unnamed parameter
-#
-# VARIABLES
-#
-# You can declare variables with:
-#   var name = value
-#
-# You can use variables inside numeric expressions.
-# Example:
-#   var hmetal = 0.48
-#   7/0: 0.5 0.5+hmetal*2        # 2x thick metal
-#
-# You cannot use variables inside layer specifications currently.
-#
-# CONDITIONALS
-#
-# You can enable or disable branches of the table using 'if', 'else', 'elseif' and 'end':
-# Example:
-#   var thick_m1 = true
-#   if thickm1
-#     1: 0.5 1.5
-#   else
-#     1: 0.5 1.2
-#   end
-
-</src>
+  <src>130/16: height = 1
+40/2: height = 1
+20/1: height = 0.5
+50/3: height = 0.5
+51/4: height = 1
+90/5: height = 0.5
+70/6: height = 0.5
+80/7: height = 0.5	
+81/8: height = 0.5
+82/9: height = 0.5
+91/10: height = 0.5
+71/11: height = 0.5
+72/12: height = 0.5
+92/13: height = 0.5
+73/14: height = 0.5
+120/15: height = 0.5</src>
  </d25>
  <connectivity>
  </connectivity>

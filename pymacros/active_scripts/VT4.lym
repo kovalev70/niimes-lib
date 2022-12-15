@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>true</autorun-early>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>import pya 
+
+class VT4(pya.PCellDeclarationHelper):
+    
+    def __init__(self):
+        
+        super(VT4, self).__init__()
+        
+        self.via3 = pya.LayerInfo(72, 12, "Via3")
+        self.ohmic = pya.LayerInfo(20, 1, "Ohmic")
+        self.mesa = pya.LayerInfo(40, 2, "Mesa")
+        self.dgate = pya.LayerInfo(51, 4, "Dgate")
+        self.via1 = pya.LayerInfo(70, 6, "Via1")
+        self.via2 = pya.LayerInfo(71, 11, "Via2")
+        self.pad = pya.LayerInfo(50, 3, "Pad")
+        self.met2 = pya.LayerInfo(92, 13, "Met2")
+        
+        self.param("via3", self.TypeLayer, "Layer of Via3", default=self.via3, hidden = True)
+        self.param("ohmic", self.TypeLayer, "Layer of Ohmic", default=self.ohmic, hidden = True)
+        self.param("mesa", self.TypeLayer, "Layer of Mesa", default=self.mesa, hidden = True)
+        self.param("dgate", self.TypeLayer, "Layer of Dgate", default=self.dgate, hidden = True)
+        self.param("via1", self.TypeLayer, "Layer of Via1", default=self.via1, hidden = True)
+        self.param("via2", self.TypeLayer, "Layer of Via2", default=self.via2, hidden = True)
+        self.param("pad", self.TypeLayer, "Layer of Pad", default=self.pad, hidden = True)
+        self.param("met2", self.TypeLayer, "Layer of Met2", default=self.met2, hidden = True)
+
+        self.param("length", self.TypeDouble, "Длина конденсатора", default=50)
+
+    def display_text_impl(self):
+            return (f'SUBCKT | ID=C1 | NET="MIMCAP1" | L={self.length}')
+
+    def coerce_parameters_impl(self):
+
+        if (self.length &lt; 15  or self.length &gt; 125 ): 
+            raise(RuntimeError("Ширина конденсатора должна быть больше 20 и меньше 450"))
+
+    def insertPolygons(self, pts_layer, layer):
+        polygon = pya.SimplePolygon(pts_layer)
+        self.cell.shapes(layer).insert(polygon)
+        
+    def produce_impl(self):
+        self.cell.shapes(self.via3_layer).insert(pya.Box(0,11000,10500,59000))
+        self.cell.shapes(self.via3_layer).insert(pya.Box(21000,0,20000+self.length*1000,13100))
+        self.cell.shapes(self.via3_layer).insert(pya.Box(21000,30500,20000+self.length*1000,39500))
+        self.cell.shapes(self.via3_layer).insert(pya.Box(21000,56900,20000+self.length*1000,70000))
+        self.cell.shapes(self.via3_layer).insert(pya.Box(31000+self.length*1000,16000,41000+self.length*1000,54000))
+        
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(20500,3600,20500+self.length*1000,13600))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(20500,16800,20500+self.length*1000,26800))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(20500,30000,20500+self.length*1000,40000))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(20500,43200,20500+self.length*1000,53200))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(20500,56400,20500+self.length*1000,66400))
+
+        self.cell.shapes(self.mesa_layer).insert(pya.Box(19500,2600,21500+self.length*1000,67400))
+        
+        self.cell.shapes(self.dgate_layer).insert(pya.Box(15500,15100,25000+self.length*1000,15300))
+        self.cell.shapes(self.dgate_layer).insert(pya.Box(15500,28300,25000+self.length*1000,28500))
+        self.cell.shapes(self.dgate_layer).insert(pya.Box(15500,41500,25000+self.length*1000,41700))
+        self.cell.shapes(self.dgate_layer).insert(pya.Box(15500,54700,25000+self.length*1000,54900))
+        
+        self.cell.shapes(self.via1_layer).insert(pya.Box(10500,13200,14500,17200))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(10500,26400,14500,30400))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(10500,39600,14500,43600))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(10500,52800,14500,56800))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(22000,5100,19000+self.length*1000,12100))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(22000,18300,19000+self.length*1000,25300))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(22000,31500,19000+self.length*1000,38500))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(22000,44700,19000+self.length*1000,51700))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(22000,57900,19000+self.length*1000,64900))
+        
+        self.cell.shapes(self.via2_layer).insert(pya.Box(2500,13500,8000,56500))
+        self.cell.shapes(self.via2_layer).insert(pya.Box(23500,2500,17500+self.length*1000,10600))
+        self.cell.shapes(self.via2_layer).insert(pya.Box(23500,33000,17500+self.length*1000,37000))
+        self.cell.shapes(self.via2_layer).insert(pya.Box(23500,59400,17500+self.length*1000,67500))
+        self.cell.shapes(self.via2_layer).insert(pya.Box(33500+self.length*1000,18500,38500+self.length*1000,51500))
+        
+        pts_pad1 = [pya.Point(9500,12200),pya.Point(15500,12200),pya.Point(17500,14200),
+                    pya.Point(17500,16200),pya.Point(15500,18200),pya.Point(9500,18200)]
+                    
+        pts_pad2 = [pya.Point(9500,25400),pya.Point(15500,25400),pya.Point(17500,27400),
+                    pya.Point(17500,29400),pya.Point(15500,31400),pya.Point(9500,31400)]
+                    
+        pts_pad3 = [pya.Point(9500,38600),pya.Point(15500,38600),pya.Point(17500,40600),
+                    pya.Point(17500,42600),pya.Point(15500,44600),pya.Point(9500,44600)]
+                    
+        pts_pad4 = [pya.Point(9500,51800),pya.Point(15500,51800),pya.Point(17500,53800),
+                    pya.Point(17500,55800),pya.Point(15500,57800),pya.Point(9500,57800)]
+                    
+        self.insertPolygons(pts_pad1, self.pad_layer)
+        self.insertPolygons(pts_pad2, self.pad_layer)
+        self.insertPolygons(pts_pad3, self.pad_layer)
+        self.insertPolygons(pts_pad4, self.pad_layer)
+        
+        pts_pad11 = [pya.Point(24000+self.length*1000,13750),pya.Point(25500+self.length*1000,13750),pya.Point(25500+self.length*1000,15750),
+                     pya.Point(23000+self.length*1000,15750),pya.Point(23000+self.length*1000,14750)]
+                     
+        pts_pad12 = [pya.Point(23000+self.length*1000,27850),pya.Point(25500+self.length*1000,27850),pya.Point(25500+self.length*1000,29850),
+                     pya.Point(24000+self.length*1000,29850),pya.Point(23000+self.length*1000,28850)]
+                     
+        pts_pad13 = [pya.Point(24000+self.length*1000,40150),pya.Point(25500+self.length*1000,40150),pya.Point(25500+self.length*1000,42150),
+                     pya.Point(23000+self.length*1000,42150),pya.Point(23000+self.length*1000,41150)]
+                     
+        pts_pad14 = [pya.Point(23000+self.length*1000,54250),pya.Point(25500+self.length*1000,54250),pya.Point(25500+self.length*1000,56250),
+                     pya.Point(24000+self.length*1000,56250),pya.Point(23000+self.length*1000,55250)]
+                     
+        self.insertPolygons(pts_pad11, self.pad_layer)
+        self.insertPolygons(pts_pad12, self.pad_layer)
+        self.insertPolygons(pts_pad13, self.pad_layer)
+        self.insertPolygons(pts_pad14, self.pad_layer)
+        
+        
+        self.cell.shapes(self.met2_layer).insert(pya.Box(1500,12500,9000,57500))
+        self.cell.shapes(self.met2_layer).insert(pya.Box(32500+self.length*1000,17500,39500+self.length*1000,52500))
+        
+        pts_met21 = [pya.Point(22500,1500),pya.Point(22500,11600),pya.Point(23500,11600),
+                     pya.Point(23500,32000),pya.Point(22500,32000),pya.Point(22500,38000),
+                     pya.Point(23500,38000),pya.Point(23500,58400),pya.Point(22500,58400),
+                     pya.Point(22500,68500),pya.Point(18500+self.length*1000,68500),pya.Point(18500+self.length*1000,58400),
+                     pya.Point(32500,58400),pya.Point(32500,38000),pya.Point(18500+self.length*1000,38000),
+                     pya.Point(18500+self.length*1000,32000),pya.Point(32500,32000),pya.Point(32500,11600),
+                     pya.Point(18500+self.length*1000,11600),pya.Point(18500+self.length*1000,1500),]
+                     
+        if self.length &lt;36:
+            self.insertPolygons(pts_met21, self.met2_layer)
+
+        pts_met22 = [pya.Point(22500,1500),pya.Point(22500,11600),pya.Point(28500,11600),
+                     pya.Point(28500,32000),pya.Point(22500,32000),pya.Point(22500,38000),
+                     pya.Point(28500,38000),pya.Point(28500,58400),pya.Point(22500,58400),
+                     pya.Point(22500,68500),pya.Point(18500+self.length*1000,68500),pya.Point(18500+self.length*1000,58400),
+                     pya.Point(40500,58400),pya.Point(40500,38000),pya.Point(18500+self.length*1000,38000),
+                     pya.Point(18500+self.length*1000,32000),pya.Point(40500,32000),pya.Point(40500,11600),
+                     pya.Point(18500+self.length*1000,11600),pya.Point(18500+self.length*1000,1500),]
+        if 36 &lt;= self.length &lt;= 60:
+            self.insertPolygons(pts_met22, self.met2_layer)
+        
+        if 61&lt;= self.length &lt;=125:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(22500,1500,18500+self.length*1000,11600))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(22500,32000,18500+self.length*1000,38000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(22500,58400,18500+self.length*1000,68500))
+        
+        if 61&lt;= self.length &lt;=80:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(58500,11600,72500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(58500,38000,72500,58400))
+        if 81&lt;= self.length &lt;=90:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(68500,11600,82500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(68500,38000,82500,58400))
+        if 91&lt;= self.length &lt;=100:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(76500,11600,90500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(76500,38000,90500,58400))
+        if 101&lt;= self.length &lt;=110:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(61500,11600,75500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(61500,38000,75500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(99500,11600,113500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(99500,38000,113500,58400))
+        if 111&lt;= self.length &lt;=120:
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(61500,11600,75500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(61500,38000,75500,58400))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(104500,11600,118500,32000))
+            self.cell.shapes(self.met2_layer).insert(pya.Box(104500,38000,118500,58400))
+</text>
+</klayout-macro>

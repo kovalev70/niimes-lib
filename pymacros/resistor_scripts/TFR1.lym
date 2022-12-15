@@ -33,11 +33,7 @@ class TFR1(pya.PCellDeclarationHelper):
 
     def display_text_impl(self):
 
-        return (f'SUBCKT\n'
-                f'ID=R1\n'
-                f'NET="TFR1"\n'
-                f'W={self.width}\n'
-                f'L={self.length}')
+        return (f'SUBCKT | ID=R1 | NET="TFR1" | W={self.width} | L={self.length}')
 
     def coerce_parameters_impl(self):
 
