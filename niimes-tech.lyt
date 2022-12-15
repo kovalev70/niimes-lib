@@ -154,22 +154,22 @@
   </mag>
  </writer-options>
  <d25>
-  <src>130/16: height = 1
-40/2: height = 1
-20/1: height = 0.5
-50/3: height = 0.5
-51/4: height = 1
-90/5: height = 0.5
-70/6: height = 0.5
-80/7: height = 0.5	
-81/8: height = 0.5
-82/9: height = 0.5
-91/10: height = 0.5
-71/11: height = 0.5
-72/12: height = 0.5
-92/13: height = 0.5
-73/14: height = 0.5
-120/15: height = 0.5</src>
+  <src>120/15: height = 0.5
+130/16: zstart = 0 height = 1
+40/2: zstart = 1 height = 1
+51/4: zstart = 1.3 height = 0.2
+70/6: zstart = 2 height = 0.5
+72/12: zstart = 2.5 height = 0.5
+20/1: zstart = 2 height = 0.6
+90/5: zstart = 2.5 height = 0.8
+80/7: zstart = 2.5 height = 0.5
+81/8: zstart = 2.5 height = 0.5
+82/9: zstart = 2.5 height = 0.5
+91/10: zstart = 2.5 height = 1
+71/11: zstart = 3.5 height = 0.5
+92/13: zstart = 4 height = 1
+50/3: zstart = 1.5 height = 0.5
+73/14: zstart = 3 height = 0.5</src>
  </d25>
  <connectivity>
  </connectivity>
