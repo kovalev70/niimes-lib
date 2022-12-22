@@ -6,7 +6,7 @@
  <prolog/>
  <epilog/>
  <doc/>
- <autorun>true</autorun>
+ <autorun>false</autorun>
  <autorun-early>true</autorun-early>
  <shortcut/>
  <show-in-menu>false</show-in-menu>
@@ -16,11 +16,11 @@
  <dsl-interpreter-name/>
  <text>import pya 
 
-class VT4(pya.PCellDeclarationHelper):
+class VT(pya.PCellDeclarationHelper):
     
     def __init__(self):
         
-        super(VT4, self).__init__()
+        super(VT, self).__init__()
         
         self.via3 = pya.LayerInfo(72, 12, "Via3")
         self.ohmic = pya.LayerInfo(20, 1, "Ohmic")

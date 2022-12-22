@@ -196,7 +196,7 @@ enclosed(via4, met1, 6.um).output("73-5 Полное окружение элем
 backvia.drc(bbox_width != 60.um).output("120-1 Длина элемента слоя 120 = 60мкм")
 backvia.drc(bbox_height != 30.um).output("120-2 Ширина элемента слоя 120 = 30мкм")
 space(backvia,60.um).output("120-3 Расстояние между элементами слоя 120 &gt;=60мкм")
-backvia.rounded_corners(0, 15.um, 128).output("120-4 Радиус скругления элемента слоя 120 = 15мкм")
+backvia.rounded_corners(0, 15.um, 32).output("120-4 Радиус скругления элемента слоя 120 = 15мкм")
 enclosed(backvia, ohmic, 20.um).output("120-5 Полное окружение элементов слоя 120 элементами слоя 20 &gt;= 20мкм")
 enclosed(backvia, met1, 19.um).output("120-6 Полное окружение элементов слоя 120 элементами слоя 91 &gt;= 19мкм")
 enclosed(backvia, met2, 18.um).output("120-7 Полное окружение элементов слоя 120 элементами слоя 92 &gt;= 18мкм")

@@ -14,15 +14,16 @@
  <menu-path/>
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
- <text>class Actives(pya.Library):
+ <text>
+class BackSideVia(pya.Library):
 
   def __init__(self):
   
     self.description = "Сюда нужно добавить описание"
     
-    self.layout().register_pcell("VT4", VT4())
+    self.layout().register_pcell("BACKVIA", BACKVIA())
 
-    self.register("Actives")
-Actives()
+    self.register("BackSideVia")
+BackSideVia()
 </text>
 </klayout-macro>
