@@ -14,15 +14,15 @@
  <menu-path/>
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
- <text>class Capacitors(pya.Library):
-
+ <text>from active_elements.CPW.VT import *
+class CPW(pya.Library):
   def __init__(self):
   
     self.description = "Сюда нужно добавить описание"
     
-    self.layout().register_pcell("MIMCAP1", MIMCAP1())
+    self.layout().register_pcell("VT", VT())
 
-    self.register("Capacitors")
-Capacitors()
+    self.register("CPW")
+CPW()
 </text>
 </klayout-macro>

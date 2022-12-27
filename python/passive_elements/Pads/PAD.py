@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya
+import pya
 
 class PAD(pya.PCellDeclarationHelper):
 
@@ -39,10 +23,10 @@ class PAD(pya.PCellDeclarationHelper):
     
   def coerce_parameters_impl(self):
     
-    if (self.width &lt; 75 or self.width &gt; 250):
+    if (self.width < 75 or self.width > 250):
       raise(RuntimeError("Высота должна быть задана в диапазоне от 75 до 250"))
       
-    if (self.length &lt; 75 or self.length &gt; 250):
+    if (self.length < 75 or self.length > 250):
       raise(RuntimeError("Ширина должна быть задана в диапазоне от 75 до 250"))
       
   def display_text_impl(self):
@@ -62,5 +46,3 @@ class PAD(pya.PCellDeclarationHelper):
     self.cell.shapes(self.met2_layer).insert(pya.Box(pts_met2[0], pts_met2[1]))
     self.cell.shapes(self.met1_layer).insert(pya.Box(pts_met1[0], pts_met1[1]))
     self.cell.shapes(self.via3_layer).insert(pya.Box(pts_via3[0], pts_via3[1]))
-</text>
-</klayout-macro>

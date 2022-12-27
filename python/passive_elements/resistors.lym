@@ -14,16 +14,22 @@
  <menu-path/>
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
- <text>class Inductors(pya.Library):
+ <text>from passive_elements.Resistors.TFR1 import *
+from passive_elements.Resistors.TFR2 import *
+from passive_elements.Resistors.TFR3 import *
+from passive_elements.Resistors.MSR import *
+class Resistors(pya.Library):
 
   def __init__(self):
   
     self.description = "Сюда нужно добавить описание"
     
-    self.layout().register_pcell("Rost_EM_Rectangular", Rost_EM_Rectangular())
+    self.layout().register_pcell("TFR1", TFR1())
+    self.layout().register_pcell("TFR2", TFR2())
+    self.layout().register_pcell("TFR3", TFR3())
+    self.layout().register_pcell("MSR", MSR())
 
-    self.register("Inductors")
-    
-Inductors()
+    self.register("Resistors")
+Resistors()
 </text>
 </klayout-macro>

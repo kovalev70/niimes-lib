@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya 
+import pya 
 
 class MSR(pya.PCellDeclarationHelper):
     
@@ -41,10 +25,10 @@ class MSR(pya.PCellDeclarationHelper):
 
     def coerce_parameters_impl(self):
 
-        if (self.width &lt; 10  or self.width &gt; 300 ): 
+        if (self.width < 10  or self.width > 300 ): 
             raise(RuntimeError("Ширина должна быть больше 10 мкм и меньше 300 мкм"))
         
-        if(self.length &lt; 10 or self.length &gt; 300):
+        if(self.length < 10 or self.length > 300):
             raise(RuntimeError("Длина должна быть больше 10 мкм и меньше 300 мкм"))
       
     def produce_impl(self):
@@ -63,5 +47,3 @@ class MSR(pya.PCellDeclarationHelper):
         
         self.cell.shapes(self.via1_layer).insert(pya.Box(2500,2500,self.length*1000-2500,self.width*1200-2500))
         self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*1800+2500, 2500, self.length*2800-2500, self.width*1200-2500))
-</text>
-</klayout-macro>

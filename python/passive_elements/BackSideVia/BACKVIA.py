@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya 
+import pya 
 
 class BACKVIA(pya.PCellDeclarationHelper):
     
@@ -66,7 +50,3 @@ class BACKVIA(pya.PCellDeclarationHelper):
             self.cell.shapes(self.met1_layer).insert(pya.Box(pya.Point(-1000, 32000), pya.Point(1000, 34000)))
             self.cell.shapes(self.met1_layer).insert(pya.Box(pya.Point(47000, -1000), pya.Point(49000, 1000)))
             self.cell.shapes(self.met1_layer).insert(pya.Box(pya.Point(1000, -32000), pya.Point(-1000, -34000)))
-
-        
-</text>
-</klayout-macro>

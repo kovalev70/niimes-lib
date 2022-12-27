@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya 
+import pya 
 
 class MIMCAP1(pya.PCellDeclarationHelper):
     
@@ -43,13 +27,13 @@ class MIMCAP1(pya.PCellDeclarationHelper):
     
   def coerce_parameters_impl(self):
 
-    if (self.width &lt; 20  or self.width &gt; 450 ): 
+    if (self.width < 20  or self.width > 450 ): 
         raise(RuntimeError("Ширина конденсатора должна быть больше 20 и меньше 450"))
         
-    if(self.length &lt; 20 or self.length &gt; 450):
+    if(self.length < 20 or self.length > 450):
         raise(RuntimeError("Длина конденсатора должна быть болшьше 20 и меньше 450"))
             
-    if(self.w1 &lt; 12 or self.length &gt; 150):
+    if(self.w1 < 12 or self.length > 150):
         raise(RuntimeError("Ширина подводящего проводника должна быть болшьше 12 и меньше 150"))
 
   def produce_impl(self):
@@ -70,6 +54,3 @@ class MIMCAP1(pya.PCellDeclarationHelper):
         self.cell.shapes(self.met2_layer).insert(pya.Box(1000,(self.width*1000+8000-self.w1*1000)/2,8000,(self.width*1000+4000+self.w1*1000)/2))
         self.cell.shapes(self.via2_layer).insert(pya.Box(2000,(self.width*1000+10000-self.w1*1000)/2,7000,(self.width*1000+2000+self.w1*1000)/2))
         self.cell.shapes(self.via3_layer).insert(pya.Box(-500,(self.width*1000+5000-self.w1*1000)/2,9500,(self.width*1000+7000+self.w1*1000)/2))
-
-</text>
-</klayout-macro>

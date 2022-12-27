@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya 
+import pya 
 
 class VT(pya.PCellDeclarationHelper):
     
@@ -51,7 +35,7 @@ class VT(pya.PCellDeclarationHelper):
 
     def coerce_parameters_impl(self):
 
-        if (self.length &lt; 15  or self.length &gt; 125 ): 
+        if (self.length < 15  or self.length > 125 ): 
             raise(RuntimeError("Ширина транзистора должна быть больше 15 и меньше 125"))
 
     def insertPolygons(self, pts_layer, layer):
@@ -97,39 +81,39 @@ class VT(pya.PCellDeclarationHelper):
             self.cell.shapes(self.met2_layer).insert(pya.Box(1500,12500,9000,30500))
             self.cell.shapes(self.met2_layer).insert(pya.Box(32500+self.length*1000,18500,39500+self.length*1000,24500))
         
-            if self.length &lt;36:
+            if self.length < 36:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,1500,18500+self.length*1000,11300))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,31700,18500+self.length*1000,41500))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(23500,11300,32500,31700))
             
-            if 36&lt;= self.length &lt;=60:
+            if 36 <= self.length <= 60:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,1500,18500+self.length*1000,11300))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,31700,18500+self.length*1000,41500))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11300,40500,31700))
     
-            if 61&lt;= self.length &lt;=125:
+            if 61 <= self.length <= 125:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,1500,18500+self.length*1000,11300))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,31700,18500+self.length*1000,41500))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11300,42500,31700))
            
-            if 61&lt;= self.length &lt;=80:
+            if 61 <= self.length <= 80:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(58500,11300,72500,31700))
   
-            if 81&lt;= self.length &lt;=90:
+            if 81 <= self.length <= 90:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(68500,11300,82500,31700))
      
-            if 91&lt;= self.length &lt;=100:
+            if 91 <= self.length <= 100:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(76500,11300,90500,31700))
    
-            if 101&lt;= self.length &lt;=110:
+            if 101 <= self.length <= 110:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(61500,11300,75500,31700))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(99500,11300,113500,31700))
             
-            if 111&lt;= self.length &lt;=120:
+            if 111 <= self.length <= 120:
                self.cell.shapes(self.met2_layer).insert(pya.Box(66500,11300,80500,31700))
                self.cell.shapes(self.met2_layer).insert(pya.Box(104500,11300,118500,31700))
             
-            if 121&lt;= self.length &lt;=125:
+            if 121 <= self.length <= 125:
                self.cell.shapes(self.met2_layer).insert(pya.Box(71500,11300,85500,31700))
                self.cell.shapes(self.met2_layer).insert(pya.Box(119500,11300,133500,31700))
         
@@ -188,7 +172,7 @@ class VT(pya.PCellDeclarationHelper):
                         pya.Point(18500+self.length*1000,32000),pya.Point(32500,32000),pya.Point(32500,11600),
                         pya.Point(18500+self.length*1000,11600),pya.Point(18500+self.length*1000,1500),]
                      
-            if self.length &lt;36:
+            if self.length < 36:
                 self.insertPolygons(pts_met21, self.met2_layer)
 
             pts_met22 = [pya.Point(22500,1500),pya.Point(22500,11600),pya.Point(28500,11600),
@@ -198,47 +182,46 @@ class VT(pya.PCellDeclarationHelper):
                          pya.Point(40500,58400),pya.Point(40500,38000),pya.Point(18500+self.length*1000,38000),
                          pya.Point(18500+self.length*1000,32000),pya.Point(40500,32000),pya.Point(40500,11600),
                          pya.Point(18500+self.length*1000,11600),pya.Point(18500+self.length*1000,1500),]
-            if 36 &lt;= self.length &lt;= 60:
+            if 36 <= self.length <= 60:
                 self.insertPolygons(pts_met22, self.met2_layer)
         
-            if 61&lt;= self.length &lt;=125:
+            if 61 <= self.length <= 125:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,1500,18500+self.length*1000,11600))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,32000,18500+self.length*1000,38000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,58400,18500+self.length*1000,68500))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11600,42500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(28500,38000,42500,58400))
         
-            if 61&lt;= self.length &lt;=80:
+            if 61 <= self.length <= 80:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(58500,11600,72500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(58500,38000,72500,58400))
             
-            if 81&lt;= self.length &lt;=90:
+            if 81 <= self.length <= 90:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(68500,11600,82500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(68500,38000,82500,58400))
             
-            if 91&lt;= self.length &lt;=100:
+            if 91 <= self.length <= 100:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(76500,11600,90500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(76500,38000,90500,58400))
             
-            if 101&lt;= self.length &lt;=110:
+            if 101 <= self.length <= 110:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(61500,11600,75500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(61500,38000,75500,58400))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(99500,11600,113500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(99500,38000,113500,58400))
                 
-            if 111&lt;= self.length &lt;=120:
+            if 111 <= self.length <= 120:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(66500,11600,80500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(66500,38000,80500,58400))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(104500,11600,118500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(104500,38000,118500,58400))
             
-            if 121&lt;= self.length &lt;=125:
+            if 121 <= self.length <= 125:
                 self.cell.shapes(self.met2_layer).insert(pya.Box(71500,11600,85500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(71500,38000,85500,58400))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(119500,11600,133500,32000))
                 self.cell.shapes(self.met2_layer).insert(pya.Box(119500,38000,133500,58400))
         
-            #met1 layer
             self.cell.shapes(self.met1_layer).insert(pya.Box(500,11500,10000,58500))
             self.cell.shapes(self.met1_layer).insert(pya.Box(21500,500,19500+self.length*1000,12600))
             self.cell.shapes(self.met1_layer).insert(pya.Box(21500,57400,19500+self.length*1000,69500))
@@ -297,43 +280,43 @@ class VT(pya.PCellDeclarationHelper):
             for i in range(2):
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,32800+i*26400,18500+self.length*1000,38800+i*26400))
                 
-            if self.length &lt;36:
+            if self.length < 36:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(23500,12400+i*26400,32500,32800+i*26400))
             
-            if 36&lt;= self.length &lt;=60:
+            if 36 <= self.length <= 60:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(28500,12400+i*26400,40500,32800+i*26400))
 
-            if 61&lt;= self.length &lt;=125:
+            if 61 <= self.length <= 125:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(28500,12400+i*26400,42500,32800+i*26400))
 
-            if 61&lt;= self.length &lt;=80:
+            if 61 <= self.length <= 80:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(58500,12400+i*26400,72500,32800+i*26400))
   
-            if 81&lt;= self.length &lt;=90:
+            if 81 <= self.length <= 90:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(68500,12400+i*26400,82500,32800+i*26400))
      
-            if 91&lt;= self.length &lt;=100:
+            if 91 <= self.length <= 100:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(76500,12400+i*26400,90500,32800+i*26400))
    
-            if 101&lt;= self.length &lt;=110:
+            if 101 <= self.length <= 110:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(61500,12400+i*26400,75500,32800+i*26400))
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(99500,12400+i*26400,113500,32800+i*26400))
             
-            if 111&lt;= self.length &lt;=120:
+            if 111 <= self.length <= 120:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(66500,12400+i*26400,80500,32800+i*26400))
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(109500,12400+i*26400,123500,32800+i*26400))
             
-            if 121&lt;= self.length &lt;=125:
+            if 121 <= self.length <= 125:
                 for i in range(3):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(71500,12400+i*26400,85500,32800+i*26400))
                 for i in range(3):
@@ -400,43 +383,43 @@ class VT(pya.PCellDeclarationHelper):
             
             for i in range(3):
                 self.cell.shapes(self.met2_layer).insert(pya.Box(22500,32100+i*26400,18500+self.length*1000,38100+i*26400))
-            if self.length &lt;36:
+            if self.length < 36:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(23500,11700+i*26400,32500,32100+i*26400))
                 
-            if 36&lt;= self.length &lt;=60:
+            if 36 <= self.length <= 60:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11700+i*26400,40500,32100+i*26400))
     
-            if 61&lt;= self.length &lt;=125:
+            if 61 <= self.length <= 125:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(28500,11700+i*26400,42500,32100+i*26400))
     
-            if 61&lt;= self.length &lt;=80:
+            if 61 <= self.length <= 80:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(58500,11700+i*26400,72500,32100+i*26400))
       
-            if 81&lt;= self.length &lt;=90:
+            if 81 <= self.length <= 90:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(68500,11700+i*26400,82500,32100+i*26400))
          
-            if 91&lt;= self.length &lt;=100:
+            if 91 <= self.length <= 100:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(76500,11700+i*26400,90500,32100+i*26400))
        
-            if 101&lt;= self.length &lt;=110:
+            if 101 <= self.length <= 110:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(61500,11700+i*26400,75500,32100+i*26400))
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(99500,11700+i*26400,113500,32100+i*26400))
                 
-            if 111&lt;= self.length &lt;=120:
+            if 111 <= self.length <= 120:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(66500,11700+i*26400,80500,32100+i*26400))
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(109500,11700+i*26400,123500,32100+i*26400))
                 
-            if 121&lt;= self.length &lt;=125:
+            if 121 <= self.length <= 125:
                 for i in range(4):
                     self.cell.shapes(self.met2_layer).insert(pya.Box(71500,11700+i*26400,85500,32100+i*26400))
                 for i in range(4):
@@ -450,5 +433,3 @@ class VT(pya.PCellDeclarationHelper):
 
             for i in range(int(3)):
                 self.cell.shapes(self.met1_layer).insert(pya.Box(21500,31100+i*26400,self.length*1000+19500,39100+i*26400))
-                </text>
-</klayout-macro>

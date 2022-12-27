@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya 
+import pya 
 
 class TFR2(pya.PCellDeclarationHelper):
     
@@ -37,10 +21,10 @@ class TFR2(pya.PCellDeclarationHelper):
 
     def coerce_parameters_impl(self):
 
-        if (self.width &lt; 6  or self.width &gt; 300 ): 
+        if (self.width < 6  or self.width > 300 ): 
             raise(RuntimeError("Ширина должна быть больше 6 мкм и меньше 300 мкм"))
         
-        if(self.length &lt; 8 or self.length &gt; 300):
+        if(self.length < 8 or self.length > 300):
             raise(RuntimeError("Длинна должна быть больше 8 мкм и меньше 300 мкм"))
 
     def produce_impl(self):
@@ -48,5 +32,3 @@ class TFR2(pya.PCellDeclarationHelper):
         self.cell.shapes(self.met1_layer).insert(pya.Box(0, 0, 6000, self.width*1000+2000))
         self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*1000 +6000, 0, self.length*1000+12000, self.width*1000+2000))
         self.cell.shapes(self.tfr2_layer).insert(pya.Box(2000, 1000, self.length*1000+10000, self.width*1000+1000))
-</text>
-</klayout-macro>

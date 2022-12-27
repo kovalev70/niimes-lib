@@ -1,20 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<klayout-macro>
- <description/>
- <version/>
- <category>pymacros</category>
- <prolog/>
- <epilog/>
- <doc/>
- <autorun>false</autorun>
- <autorun-early>true</autorun-early>
- <shortcut/>
- <show-in-menu>false</show-in-menu>
- <group-name/>
- <menu-path/>
- <interpreter>python</interpreter>
- <dsl-interpreter-name/>
- <text>import pya
+import pya
 
 class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
 
@@ -44,7 +28,7 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
 
   def insertBoxes(self, pts_layer, layer):
     i = len(pts_layer)
-    while i &gt;= 0:
+    while i >= 0:
       self.cell.shapes(layer).insert(pya.Box(pts_layer[i - 2], pts_layer[i - 1]))
       i -= 2
 
@@ -54,19 +38,19 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
     
   def coerce_parameters_impl(self):
 
-        if (self.Rd &lt; 25 or self.Rd &gt; 150): 
+        if (self.Rd < 25 or self.Rd > 150): 
             raise(RuntimeError("Внутреннее растояние должно принимиать значения в диапазоне от 25 до 150"))
 
-        if (self.Nt &lt; 1.5 or self.Nt &gt; 19.5): 
+        if (self.Nt < 1.5 or self.Nt > 19.5): 
             raise(RuntimeError("Количество витков должно принимиать значения в диапазоне от 1.5 до 19.5"))
 
         if (self.Nt % 0.25 != 0): 
             raise(RuntimeError("Количество витков должно быть кратно 0.25"))
             
-        if (self.W &lt; 7 or self.W &gt; 40):
+        if (self.W < 7 or self.W > 40):
             raise(RuntimeError("Ширина должна быть задана в диапазоне от 7 до 40"))
             
-        if (self.S &lt; 7 or self.S &gt; 40):
+        if (self.S < 7 or self.S > 40):
             raise(RuntimeError("Зазор должен быть задан в диапазоне от 7 до 40"))
     
   def produce_impl(self):
@@ -165,7 +149,7 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
     elif cur_direction == 4:
       pts_met2.append(pya.Point(pts_met2[cur_point - 1].x, pts_met2[cur_point - 1].y - (self.Ln + self.W / 2) * 1000))
       
-      if pts_met2[-1].y - pts_met1[1].y - 1000 &lt;= 25000:
+      if pts_met2[-1].y - pts_met1[1].y - 1000 <= 25000:
         kW2 += 1
         kS2 += 1
       
@@ -188,6 +172,4 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
     self.insertBoxes(pts_met2_2, self.met2_layer)
     self.insertBoxes(pts_via3_2, self.via3_layer)
     self.cell.shapes(self.met2_layer).insert(pya.Path(pts_met2, self.W * 1000)) 
-    self.cell.shapes(self.via3_layer).insert(pya.Polygon(pts_via3))  
-</text>
-</klayout-macro>
+    self.cell.shapes(self.via3_layer).insert(pya.Polygon(pts_via3))

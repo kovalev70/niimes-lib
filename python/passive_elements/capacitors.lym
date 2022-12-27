@@ -14,18 +14,16 @@
  <menu-path/>
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
- <text>class Resistors(pya.Library):
+ <text>from passive_elements.Capacitors.MIMCAP1 import *
+class Capacitors(pya.Library):
 
   def __init__(self):
   
     self.description = "Сюда нужно добавить описание"
     
-    self.layout().register_pcell("TFR1", TFR1())
-    self.layout().register_pcell("TFR2", TFR2())
-    self.layout().register_pcell("TFR3", TFR3())
-    self.layout().register_pcell("MSR", MSR())
+    self.layout().register_pcell("MIMCAP1", MIMCAP1())
 
-    self.register("Resistors")
-Resistors()
+    self.register("Capacitors")
+Capacitors()
 </text>
 </klayout-macro>
