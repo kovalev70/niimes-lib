@@ -15,6 +15,8 @@
  <interpreter>python</interpreter>
  <dsl-interpreter-name/>
  <text>from passive_elements.Capacitors.MIMCAP1 import *
+from passive_elements.Capacitors.MIMCAP2 import *
+from passive_elements.Capacitors.MIMCAP3 import *
 class Capacitors(pya.Library):
 
   def __init__(self):
@@ -22,6 +24,8 @@ class Capacitors(pya.Library):
     self.description = "Сюда нужно добавить описание"
     
     self.layout().register_pcell("MIMCAP1", MIMCAP1())
+    self.layout().register_pcell("MIMCAP2", MIMCAP2())
+    self.layout().register_pcell("MIMCAP3", MIMCAP3())
 
     self.register("Capacitors")
 Capacitors()
