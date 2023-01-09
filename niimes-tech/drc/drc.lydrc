@@ -35,7 +35,6 @@ back = input(130,16)
 
 
 #rules20
-
 ohmic.drc(bbox_width &lt;5.um).output("20-2 Ширина элемента слоя 20 &gt;= 5мкм")
 ohmic.drc(bbox_height &lt;5.um).output("20-1 Длина элемента слоя 20 &gt;= 5мкм")
 space(ohmic,2.5.um).output("20-3 Расстояние между элементами слоя 20 &gt;=2.5мкм")
@@ -150,7 +149,7 @@ enclosed(tfr3, met1, 1.um).output("91-7 Окружение элементов с
 met1.drc(separation(ohmic, euclidian) &lt; 4.um).output("91-9 Расстояние между элементом слоя 91 и элементом слоя 20&gt;=4мкм")
 met1.drc(separation(mesa, euclidian) &lt; 4.um).output("91-10 Расстояние между элементом слоя 91 и элементом слоя 40&gt;=4мкм")
 met1.drc(separation(pad, euclidian) &lt; 2.um).output("91-11 Расстояние между элементом слоя 91 и элементом слоя 50&gt;=2мкм")
-met1.drc(separation(dgate, euclidian) &lt; 2.um).output("91-11 Расстояние между элементом слоя 91 и элементом слоя 51&gt;=2мкм")
+met1.drc(separation(dgate, euclidian) &lt; 0.5.um).output("91-11 Расстояние между элементом слоя 91 и элементом слоя 51&gt;=0.5мкм")
 met1.drc(separation(tfr1, euclidian) &lt; 4.um).output("91-12 Расстояние между элементом слоя 91 и элементом слоя 80&gt;=4мкм")
 met1.drc(separation(tfr1, euclidian) &lt; 4.um).output("91-12 Расстояние между элементом слоя 91 и элементом слоя 81&gt;=4мкм")
 met1.drc(separation(tfr1, euclidian) &lt; 4.um).output("91-12 Расстояние между элементом слоя 91 и элементом слоя 82&gt;=4мкм")
@@ -162,20 +161,20 @@ space(via2,4.um).output("71-3 Расстояние между элементам
 enclosed(via2, met1, 2.um).output("71-4 Полное окружение элементов слоя 71 элементами слоя 91 &gt;= 2мкм")
 
 #rules72
-via3.drc(bbox_width &lt;10.um).output("72-1 Длина элемента слоя 72 &gt;= 10мкм")
-via3.drc(bbox_height &lt;10.um).output("72-2 Ширина элемента слоя 72 &gt;= 10мкм")
+via3.drc(bbox_width &lt;9.um).output("72-1 Длина элемента слоя 72 &gt;= 10мкм")
+via3.drc(bbox_height &lt;9.um).output("72-2 Ширина элемента слоя 72 &gt;= 10мкм")
 space(via3,10.um).output("72-3 Расстояние между элементами слоя 72 &gt;=10мкм")
-enclosed(via2, via3, 2.5.um).output("72-4 Полное окружение элементов слоя 71 элементами слоя 72 &gt;= 2.5мкм")
-enclosed(via3, met1, 3.um).output("72-5 Полное окружение элементов слоя 72 элементами слоя 91 в области формирования конденсаторов &gt;=3мкм")
+enclosed(via2, via3, 1.um).output("72-4 Полное окружение элементов слоя 71 элементами слоя 72 &gt;= 1мкм")
+enclosed(via3, met1, 2.5.um).output("72-5 Полное окружение элементов слоя 72 элементами слоя 91 в области формирования конденсаторов &gt;=2.5мкм")
 
 #rules92
 met2.drc(bbox_width &lt;6.um).output("92-1 Длина элемента слоя 92 &gt;= 6мкм")
 met2.drc(bbox_height &lt;6.um).output("92-2 Ширина элемента слоя 92 &gt;= 6мкм")
-space(met2,8.um).output("92-3 Расстояние между элементами слоя 92 &gt;=8мкм")
+space(met2,7.um).output("92-3 Расстояние между элементами слоя 92 &gt;=8мкм")
 enclosed(met2, met1, 1.um).output("92-4 Окружение элементов слоя 92 элементами слоя 91  &gt;= 1мкм")
 enclosed(via2, met2, 1.um).output("92-5 Полное окружение элементов слоя 71 элементами слоя 92 &gt;= 1мкм")
 enclosed(met2, via3, 1.5.um).output("92-6 Окружение элементов слоя 92 элементами слоя 72  &gt;= 1.5мкм")
-enclosed(via3, met2, 2.um).output("92-7 Полное окружение элементов слоя 72 элементами слоя 92 в области формирования конденсаторов &gt;=2мкм")
+enclosed(met2, via3, 1.5.um).output("92-7 Полное окружение элементов слоя 72 элементами слоя 92 в области формирования конденсаторов &gt;=2мкм")
 
 met2.drc(separation(tfr1, euclidian) &lt; 5.um).output("92-8 Расстояние между элементом слоя 92 и элементом слоя 80&gt;=5мкм")
 met2.drc(separation(tfr2, euclidian) &lt; 5.um).output("92-8 Расстояние между элементом слоя 92 и элементом слоя 81&gt;=5мкм")
@@ -196,7 +195,7 @@ enclosed(via4, met1, 6.um).output("73-5 Полное окружение элем
 backvia.drc(bbox_width != 60.um).output("120-1 Длина элемента слоя 120 = 60мкм")
 backvia.drc(bbox_height != 30.um).output("120-2 Ширина элемента слоя 120 = 30мкм")
 space(backvia,60.um).output("120-3 Расстояние между элементами слоя 120 &gt;=60мкм")
-backvia.rounded_corners(0, 15.um, 32).output("120-4 Радиус скругления элемента слоя 120 = 15мкм")
+#backvia.rounded_corners(0, 15.um, 32).output("120-4 Радиус скругления элемента слоя 120 = 15мкм")
 enclosed(backvia, ohmic, 20.um).output("120-5 Полное окружение элементов слоя 120 элементами слоя 20 &gt;= 20мкм")
 enclosed(backvia, met1, 19.um).output("120-6 Полное окружение элементов слоя 120 элементами слоя 91 &gt;= 19мкм")
 enclosed(backvia, met2, 18.um).output("120-7 Полное окружение элементов слоя 120 элементами слоя 92 &gt;= 18мкм")

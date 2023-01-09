@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>d25</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>false</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>true</show-in-menu>
+ <group-name>d25_scripts</group-name>
+ <menu-path>tools_menu.d25.end</menu-path>
+ <interpreter>dsl</interpreter>
+ <dsl-interpreter-name>d25-dsl-xml</dsl-interpreter-name>
+ <text>z(input(130, 16), zstart: 0.um, height: 1.um, name: "Back")
+z(input(40, 2), zstart: 1.um, height: 1.um, name: "Mesa")
+z(input(51, 4), zstart: 1.3.um, height: 0.2.um, name: "D-gate")
+z(input(70, 6), zstart: 2.um, height: 0.5.um, name: "Via1")
+z(input(72, 12), zstart: 2.5.um, height: 0.5.um, name: "Via3")
+z(input(20, 1), zstart: 2.um, height: 0.6.um, name: "Ohmic")
+z(input(90, 5), zstart: 2.5.um, height: 0.8.um, name: "Met0")
+z(input(72, 12), zstart: 2.5.um, height: 0.5.um, name: "Via3")
+z(input(80, 7), zstart: 2.5.um, height: 0.5.um, name: "TFR1")
+z(input(81, 8), zstart: 2.5.um, height: 0.5.um, name: "TFR2")
+z(input(82, 9), zstart: 2.5.um, height: 0.5.um, name: "TFR3")
+z(input(91, 10), zstart: 2.5.um, height: 1.um, name: "Met1")
+z(input(71, 11), zstart: 3.5.um, height: 0.5.um, name: "Via2")
+z(input(80, 7), zstart: 2.5.um, height: 0.5.um, name: "TFR1")
+z(input(92, 13), zstart: 4.um, height: 1.um, name: "Met2")
+z(input(50, 3), zstart: 1.5.um, height: 0.5.um, name: "Pad")
+z(input(73, 14), zstart: 3.um, height: 0.5.um, name: "Via4")</text>
+</klayout-macro>

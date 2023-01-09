@@ -17,6 +17,7 @@
  <text>from passive_elements.Capacitors.MIMCAP1 import *
 from passive_elements.Capacitors.MIMCAP2 import *
 from passive_elements.Capacitors.MIMCAP3 import *
+from passive_elements.Capacitors.MIMIMCAP import *
 class Capacitors(pya.Library):
 
   def __init__(self):
@@ -26,6 +27,7 @@ class Capacitors(pya.Library):
     self.layout().register_pcell("MIMCAP1", MIMCAP1())
     self.layout().register_pcell("MIMCAP2", MIMCAP2())
     self.layout().register_pcell("MIMCAP3", MIMCAP3())
+    self.layout().register_pcell("MIMIMCAP", MIMIMCAP())
 
     self.register("Capacitors")
 Capacitors()
