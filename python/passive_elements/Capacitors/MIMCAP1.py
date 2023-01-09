@@ -23,6 +23,7 @@ class MIMCAP1(pya.PCellDeclarationHelper):
     self.param("outMet1", self.TypeBoolean, "Выход с met2", default=True)
         
   def display_text_impl(self):
+
     return (f'SUBCKT | ID=C1 | NET="MIMCAP1 | W={self.width} | L={self.length} | W1={self.w1}')
     
   def coerce_parameters_impl(self):
@@ -37,6 +38,7 @@ class MIMCAP1(pya.PCellDeclarationHelper):
         raise(RuntimeError("Ширина подводящего проводника должна быть болшьше 12 и меньше 150"))
 
   def produce_impl(self):
+    
     self.cell.shapes(self.met1_layer).insert(pya.Box(0,(self.width*1000+6000-self.w1*1000)/2,17000,(self.width*1000+6000+self.w1*1000)/2))
     self.cell.shapes(self.met1_layer).insert(pya.Box(0,(self.width*1000+16000-self.w1*1000)/2,2000,(self.width*1000- 4000+self.w1*1000)/2))
     self.cell.shapes(self.met1_layer).insert(pya.Box(17000,0,23000+1000*self.length,self.width*1000+6000))

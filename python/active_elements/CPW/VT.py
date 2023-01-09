@@ -31,6 +31,7 @@ class VT(pya.PCellDeclarationHelper):
         self.param("typeVT", self.TypeList, "Тип транзистора", default = 2, choices = [["VT2", 2], ["VT4", 4], ["VT6", 6], ["VT8", 8]])
         
     def display_text_impl(self):
+
         return (f'SUBCKT | ID=V1 | NET="VT{self.typeVT} | W={self.length} | NF={self.typeVT}')
 
     def coerce_parameters_impl(self):
@@ -39,10 +40,12 @@ class VT(pya.PCellDeclarationHelper):
             raise(RuntimeError("Ширина транзистора должна быть больше 15 и меньше 125"))
 
     def insertPolygons(self, pts_layer, layer):
+
         polygon = pya.SimplePolygon(pts_layer)
         self.cell.shapes(layer).insert(polygon)
         
     def produce_impl(self):
+        
         if self.typeVT == 2:
             self.NF = 2
             self.cell.shapes(self.via3_layer).insert(pya.Box(0,11000,10500,32000))
