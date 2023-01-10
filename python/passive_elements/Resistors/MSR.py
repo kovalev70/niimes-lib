@@ -33,17 +33,17 @@ class MSR(pya.PCellDeclarationHelper):
       
     def produce_impl(self):
         
-        pts_mesa = [pya.Point(0,0),pya.Point(0,self.width*1200),pya.Point(self.length*1000,self.width*1200),
-                    pya.Point(self.length*1000,self.width*1100),pya.Point(1800*self.length,self.width*1100),pya.Point(1800*self.length,self.width*1200),
-                    pya.Point(2800*self.length,self.width*1200),pya.Point(2800*self.length,0),pya.Point(1800*self.length,0),
-                    pya.Point(1800*self.length,self.width*100),pya.Point(self.length*1000,self.width*100),pya.Point(self.length*1000,0)]
+        pts_mesa = [pya.Point(0,0),pya.Point(0,self.width*1000+2000),pya.Point(10000,self.width*1000+2000),
+                    pya.Point(10000,self.width*1000+1000),pya.Point(1000*self.length+8000,self.width*1000+1000),pya.Point(1000*self.length+8000,self.width*1000+2000),
+                    pya.Point(1000*self.length+18000,self.width*1000+2000),pya.Point(1000*self.length+18000,0),pya.Point(1000*self.length+8000,0),
+                    pya.Point(1000*self.length+8000,1000),pya.Point(10000,1000),pya.Point(10000,0)]
         
         self.cell.shapes(self.mesa_layer).insert(pya.Polygon(pts_mesa))
-        self.cell.shapes(self.ohmic_layer).insert(pya.Box(1000,1000,self.length*1000-1000,self.width*1200-1000))
-        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*1800+1000,1000,self.length*2800-1000,self.width*1200-1000))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(1000,1000,9000,self.width*1000+1000))
+        self.cell.shapes(self.ohmic_layer).insert(pya.Box(self.length*1000+9000,1000,self.length*1000+17000,self.width*1000+1000))
         
-        self.cell.shapes(self.met1_layer).insert(pya.Box(2000,2000,self.length*1000-2000,self.width*1200-2000))
-        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*1800+2000,2000,self.length*2800-2000,self.width*1200-2000))
+        self.cell.shapes(self.met1_layer).insert(pya.Box(2000,2000,8000,self.width*1000))
+        self.cell.shapes(self.met1_layer).insert(pya.Box(self.length*1000+10000,2000,self.length*1000+16000,self.width*1000))
         
-        self.cell.shapes(self.via1_layer).insert(pya.Box(2500,2500,self.length*1000-2500,self.width*1200-2500))
-        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*1800+2500, 2500, self.length*2800-2500, self.width*1200-2500))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(2500,2500,7500,self.width*1000-500))
+        self.cell.shapes(self.via1_layer).insert(pya.Box(self.length*1000+10500, 2500, self.length*1000+15500, self.width*1000-500))

@@ -22,7 +22,7 @@ class TFR1(pya.PCellDeclarationHelper):
     def coerce_parameters_impl(self):
 
         if (self.width < 6  or self.width > 300 ): 
-            raise(RuntimeError("Ширина должна быть больше 6 мкм и меньше 300 мкм"))
+            raise("Ширина должна быть больше 8 мкм и меньше 300 мкм")
         
         if(self.length < 8 or self.length > 300):
             raise(RuntimeError("Длинна должна быть больше 8 мкм и меньше 300 мкм"))

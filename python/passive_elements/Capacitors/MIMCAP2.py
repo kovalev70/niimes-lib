@@ -32,13 +32,13 @@ class MIMCAP2(pya.PCellDeclarationHelper):
     
   def coerce_parameters_impl(self):
 
-    if (self.width < 20  or self.width > 450 ): 
+    if (self.width < 20  or self.width > 150 ): 
         raise(RuntimeError("Ширина конденсатора должна быть больше 20 и меньше 450"))
         
-    if(self.length < 20 or self.length > 450):
+    if(self.length < 20 or self.length > 150):
         raise(RuntimeError("Длина конденсатора должна быть болшьше 20 и меньше 450"))
             
-    if(self.w1 < 12 or self.length > 150):
+    if(self.w1 < 12 or self.w1 > 50):
         raise(RuntimeError("Ширина подводящего проводника должна быть болшьше 12 и меньше 150"))
 
   def produce_impl(self):

@@ -39,7 +39,7 @@ class MIMIMCAP(pya.PCellDeclarationHelper):
     if (self.length < 30 or self.length > 450):
         raise(RuntimeError("Длина конденсатора должна быть болшьше 30 и меньше 450"))
             
-    if (self.w1 < 14 or self.length > 150):
+    if (self.w1 < 14 or self.w1 > 150):
         raise(RuntimeError("Ширина подводящего проводника должна быть болшьше 14 и меньше 150"))
 
   def produce_impl(self):
