@@ -23,7 +23,7 @@ class BackSideVia(pya.Library):
     
     self.layout().register_pcell("BACKVIA", BACKVIA())
 
-    self.register("BackSideVia")
+    self.register("SVR_025D - BackSideVia")
 BackSideVia()
 </text>
 </klayout-macro>

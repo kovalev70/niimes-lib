@@ -14,12 +14,15 @@ class TFR2(pya.PCellDeclarationHelper):
           
         self.param("width", self.TypeDouble, "Ширина резистора", default=6)
         self.param("length", self.TypeDouble, "Длина резистора", default=8)
+        self.param("res", self.TypeDouble, "Сопротивление", readonly=True, unit="Ом")
 
     def display_text_impl(self):
  
         return (f'SUBCKT | ID=R2 | NET="TFR2" | W={self.width} | L={self.length}')
 
     def coerce_parameters_impl(self):
+
+        self.res = (self.length / self.width) * 600
 
         if (self.width < 6  or self.width > 300 ): 
             raise(RuntimeError("Ширина должна быть больше 6 мкм и меньше 300 мкм"))

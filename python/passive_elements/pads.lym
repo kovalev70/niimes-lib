@@ -24,7 +24,7 @@ class Pads(pya.Library):
     self.layout().register_pcell("PAD", PAD())
     
 
-    self.register("Pads")
+    self.register("SVR_025D - Pads")
 Pads()
 </text>
 </klayout-macro>
