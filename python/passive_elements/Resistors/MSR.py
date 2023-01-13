@@ -28,7 +28,7 @@ class MSR(pya.PCellDeclarationHelper):
         if (self.width < 10  or self.width > 300 ): 
             raise(RuntimeError("Ширина должна быть больше 10 мкм и меньше 300 мкм"))
         
-        if(self.length < 10 or self.length > 300):
+        if (self.length < 10 or self.length > 300):
             raise(RuntimeError("Длина должна быть больше 10 мкм и меньше 300 мкм"))
       
     def produce_impl(self):
