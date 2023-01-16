@@ -11,7 +11,7 @@ class Border(pya.PCellDeclarationHelper):
         self.via1 = pya.LayerInfo(70, 6, "Via1")
         self.via3 = pya.LayerInfo(72, 12, "Via3")
         self.via4 = pya.LayerInfo(73, 14, "Via4")
-        self.border = pya.LayerInfo(140, 17, "Border")
+        self.border = pya.LayerInfo(1, 0, "Border")
         self.back = pya.LayerInfo(130, 16, "Back")
 
         self.param("via2", self.TypeLayer, "Layer of Via2", default=self.via2, hidden=True)

@@ -16,6 +16,7 @@
  <interpreter>dsl</interpreter>
  <dsl-interpreter-name>d25-dsl-xml</dsl-interpreter-name>
  <text>z(input(130, 16), zstart: 0.um, height: 1.um, name: "Back")
+z(input(1, 0), zstart: 1.um, height: 1.um, name: "Border")
 z(input(40, 2), zstart: 1.um, height: 1.um, name: "Mesa")
 z(input(51, 4), zstart: 1.3.um, height: 0.2.um, name: "D-gate")
 z(input(70, 6), zstart: 2.um, height: 0.5.um, name: "Via1")

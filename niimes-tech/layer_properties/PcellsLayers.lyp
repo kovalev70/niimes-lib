@@ -18,6 +18,23 @@
   <source>Ohmic 20/1@1</source>
  </properties>
  <properties>
+  <frame-color>#2f13ff</frame-color>
+  <fill-color>#2f13ff</fill-color>
+  <frame-brightness>0</frame-brightness>
+  <fill-brightness>0</fill-brightness>
+  <dither-pattern>I9</dither-pattern>
+  <line-style/>
+  <valid>true</valid>
+  <visible>true</visible>
+  <transparent>false</transparent>
+  <width>1</width>
+  <marked>false</marked>
+  <xfill>false</xfill>
+  <animation>0</animation>
+  <name/>
+  <source>Border 1/0@1</source>
+ </properties>
+ <properties>
   <frame-color>#ff0000</frame-color>
   <fill-color>#ff0000</fill-color>
   <frame-brightness>0</frame-brightness>

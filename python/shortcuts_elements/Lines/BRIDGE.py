@@ -18,8 +18,6 @@ class BRIDGE(pya.PCellDeclarationHelper):
     
     self.param("w1", self.TypeInt, "Ширина первого и третьего выходов", default=10)
     self.param("w2", self.TypeInt, "Ширина второго и четвертого выходов", default=10)
-    self.param("Met1", self.TypeBoolean, "Линия выполнена в Met1", default=True)
-    self.param("Met2", self.TypeBoolean, "Линия выполнена в Met2", default=True)
       
   def display_text_impl(self):
   
@@ -32,14 +30,9 @@ class BRIDGE(pya.PCellDeclarationHelper):
         
         if (self.w2 < 10 or self.w2 > 50):
             raise(RuntimeError("Ширина w2 должна быть больше 10 мкм и меньше 50 мкм"))  
-            
-        if (self.Met1 == False and self.Met2 == False):
-            raise(RuntimeError("Необходимо выбрать металл"))  
               
   def produce_impl(self):
                 
-
-    if (self.Met2 == True):
         self.cell.shapes(self.met1_layer).insert(pya.Box(17000,500, 17000+self.w2*1000, 8500))
         self.cell.shapes(self.met1_layer).insert(pya.Box(17000,self.w1*1000+28500, 17000+self.w2*1000, self.w1*1000+36500))
         self.cell.shapes(self.via2_layer).insert(pya.Box(19000,2500, 15000+self.w2*1000, 6500))
@@ -49,8 +42,6 @@ class BRIDGE(pya.PCellDeclarationHelper):
         self.cell.shapes(self.met2_layer).insert(pya.Box(18000,1500, 16000+self.w2*1000, self.w1*1000+35500))
         self.cell.shapes(self.met2_layer).insert(pya.Box(18000,6500, 16000+self.w2*1000, 7500))
         self.cell.shapes(self.met2_layer).insert(pya.Box(18000,self.w1*1000+29500, 16000+self.w2*1000, self.w1*1000+30500))
-    
-    if (self.Met1 == True):
         self.cell.shapes(self.met1_layer).insert(pya.Box(0, 18500, self.w2*1000+34000, self.w1*1000+18500))
         self.cell.shapes(self.met1_layer).insert(pya.Box(0, 17500+self.w1*1000/2, 2000, 19500+self.w1*1000/2))
         self.cell.shapes(self.met1_layer).insert(pya.Box(7000,18500, 8000, self.w1*1000+18500))  
