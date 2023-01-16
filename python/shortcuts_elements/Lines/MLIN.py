@@ -28,7 +28,6 @@ class MLIN(pya.PCellDeclarationHelper):
         self.param("l_buf", self.TypeDouble, "", default=0, hidden=True)
         self.param("sum_x", self.TypeDouble, "", default=0, hidden=True)
 
-        
     def display_text_impl(self):
 
         return (f'MLIN | ID=TL1 | L={self.L} | W={self.W}')
@@ -44,9 +43,16 @@ class MLIN(pya.PCellDeclarationHelper):
             self.flag = False
 
         if (abs(self.left_point.x) != self.right_point.x) and self.sum_x != (self.left_point.x + self.right_point.x):
-            self.L = abs(self.left_point.x) + self.right_point.x - 1
+            if self.left_point.x < 0 and self.right_point.x > 0:
+                self.L = round((abs(self.left_point.x) + abs(self.right_point.x) - 1), 1)
+            elif self.left_point.x > 0:
+                self.L = round((self.right_point.x - self.left_point.x - 1), 1)
+            elif self.right_point.x < 0:
+                self.L = round((abs(self.left_point.x) - abs(self.right_point.x) - 1), 1)
+            
             self.l_buf = self.L
             self.sum_x = self.left_point.x + self.right_point.x
+
         else:
             if self.l_buf != self.L:
                 self.left_point.x = -(self.L / 2 + 0.5)
@@ -56,12 +62,16 @@ class MLIN(pya.PCellDeclarationHelper):
         self.right_point.y = 0        
 
     def produce_impl(self):
-    
-        self.cell.shapes(self.via2_layer).insert(pya.Box(pya.Point((self.left_point.x + 2.5) * 1000, (self.W / 2 - 2) * 1000), pya.Point((self.right_point.x - 2.5) * 1000, -(self.W / 2 - 2) * 1000)))
-        self.cell.shapes(self.via3_layer).insert(pya.Box(pya.Point((self.left_point.x) * 1000, (self.W / 2 + 0.5) * 1000), pya.Point((self.right_point.x) * 1000, -(self.W / 2 + 0.5) * 1000)))
+        
+        if self.Met1 and self.Met2:
+            self.cell.shapes(self.via2_layer).insert(pya.Box(pya.Point((self.left_point.x + 2.5) * 1000, (self.W / 2 - 2) * 1000), pya.Point((self.right_point.x - 2.5) * 1000, -(self.W / 2 - 2) * 1000)))
+            self.cell.shapes(self.via3_layer).insert(pya.Box(pya.Point((self.left_point.x) * 1000, (self.W / 2 + 0.5) * 1000), pya.Point((self.right_point.x) * 1000, -(self.W / 2 + 0.5) * 1000)))
 
         if self.Met1:
             self.cell.shapes(self.met1_layer).insert(pya.Box(pya.Point((self.left_point.x + 0.5) * 1000, (self.W / 2) * 1000), pya.Point((self.right_point.x - 0.5) * 1000, -(self.W / 2) * 1000)))
 
         if self.Met2:
-            self.cell.shapes(self.met2_layer).insert(pya.Box(pya.Point((self.left_point.x + 1.5) * 1000, (self.W / 2 - 1) * 1000), pya.Point((self.right_point.x - 1.5) * 1000, -(self.W / 2 - 1) * 1000)))
+            if self.Met1 == False:
+                self.cell.shapes(self.met2_layer).insert(pya.Box(pya.Point((self.left_point.x + 0.5) * 1000, (self.W / 2) * 1000), pya.Point((self.right_point.x - 0.5) * 1000, -(self.W / 2) * 1000)))
+            else:
+                self.cell.shapes(self.met2_layer).insert(pya.Box(pya.Point((self.left_point.x + 1.5) * 1000, (self.W / 2 - 1) * 1000), pya.Point((self.right_point.x - 1.5) * 1000, -(self.W / 2 - 1) * 1000)))
