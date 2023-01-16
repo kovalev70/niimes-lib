@@ -19,7 +19,7 @@ class Inductors(pya.Library):
 
   def __init__(self):
   
-    self.description = "Сюда нужно добавить описание"
+    self.description = "Катушки индуктивности"
     
     self.layout().register_pcell("Rost_EM_Rectangular", Rost_EM_Rectangular())
 

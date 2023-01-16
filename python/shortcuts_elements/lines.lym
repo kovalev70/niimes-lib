@@ -24,7 +24,7 @@ class Lines(pya.Library):
 
   def __init__(self):
   
-    self.description = "Сюда нужно добавить описание"
+    self.description = "Микрополосковые линии"
     
     self.layout().register_pcell("MLIN", MLIN())
     self.layout().register_pcell("BRIDGE", BRIDGE())
