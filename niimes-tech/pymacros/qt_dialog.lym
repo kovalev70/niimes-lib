@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from sonnet_interaction.sonnetProject import *
+from sonnet_interaction.detective import *
+import pya
+import os
+import shutil
+
+class EMDialog(pya.QDialog):
+  def __init__(self, parent = None):
+    super(EMDialog, self).__init__()
+    self.init_ui()
+    
+  def init_ui(self):  
+    self.setWindowTitle("Электромагнитное моделирование")
+    self.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\logo-01.png"))
+    self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
+    
+    self.layout_main = pya.QVBoxLayout(self)
+    self.layout_main.setContentsMargins(10, 10, 10, 10)
+    
+    self.init_menu()
+    self.init_find()
+    self.init_modeling_settings()
+    self.init_bottom_buttons()
+    
+# Элементы диалогового окна        
+  def init_menu(self):
+    self.menu_bar = pya.QMenuBar()
+    self.file_menu = pya.QMenu("Проект", self)
+    
+    self.open_action = pya.QAction("Построение графиков", self)
+    self.open_action.setShortcut(pya.QKeySequence("Ctrl+O"))
+    self.open_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\plot.png"))
+    self.open_action.triggered(self.on_open_action)
+    
+    self.create_action = pya.QAction("Экспорт в Sonnet", self)
+    self.create_action.setShortcut(pya.QKeySequence("Ctrl+P"))
+    self.create_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\data-transfer.png"))
+    self.create_action.triggered(self.on_create_action)
+    
+    self.exit_action = pya.QAction("Выход", self)
+    self.exit_action.setShortcut(pya.QKeySequence("Alt+F4"))
+    self.exit_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\exit.png"))
+    self.exit_action.triggered(self.on_exit_action)
+    
+    self.file_menu.addAction(self.open_action)
+    self.file_menu.addAction(self.create_action)
+    self.file_menu.addSeparator()
+    self.file_menu.addAction(self.exit_action)
+    
+    self.menu_bar.addMenu(self.file_menu)
+    self.layout_main.setMenuBar(self.menu_bar)
+    
+  def init_find(self):
+    layout_label = pya.QHBoxLayout(self)
+    layout_find_sonnet = pya.QHBoxLayout(self)
+
+    self.label = pya.QLabel("Путь до Sonnet:", self)
+    self.label.setMaximumHeight(13)
+    
+    self.path_to_sonnet_line = pya.QLineEdit(self)
+    self.path_to_sonnet_line.setMinimumHeight(25)
+    self.path_to_sonnet_line.setMinimumWidth(400)
+    Detective.line_cheker(self.path_to_sonnet_line)
+
+    self.find_sonnet_button = pya.QPushButton("Авто-поиск", self)
+    self.find_sonnet_button.setMinimumHeight(27)
+    self.find_sonnet_button.setMinimumWidth(150)
+    self.find_sonnet_button.clicked(self.on_find_sonnet_button)
+
+    layout_label.addWidget(self.label) 
+
+    layout_find_sonnet.addWidget(self.path_to_sonnet_line)
+    layout_find_sonnet.addWidget(self.find_sonnet_button)
+    
+    self.layout_main.addLayout(layout_label)
+    self.layout_main.addLayout(layout_find_sonnet)
+    
+  def init_modeling_settings(self):
+    layout_modeling_settings = pya.QVBoxLayout(self)
+
+    layout_abs_settings = pya.QHBoxLayout(self)
+    layout_lin_settings = pya.QHBoxLayout(self)
+
+    self.settings_window = pya.QGroupBox("Настройки моделирования", self)
+    
+    
+    double_validator = pya.QDoubleValidator(self)
+    double_validator.setNotation(pya.QDoubleValidator.StandardNotation)
+    double_validator.setBottom(1)
+    double_validator.setDecimals(2)
+    
+    self.abs_checkbox = pya.QCheckBox("ABS")
+    self.abs_from_line = pya.QLineEdit(self)
+    self.abs_from_line.setValidator(double_validator)
+    self.abs_from_line.setMaximumWidth(50)
+    self.abs_label_to = pya.QLabel("to", self)
+    self.abs_to_line = pya.QLineEdit(self)
+    self.abs_to_line.setValidator(double_validator)
+    self.abs_to_line.setMaximumWidth(50)
+    self.abs_label_unit = pya.QLabel("GHZ", self)
+
+    self.lin_checkbox = pya.QCheckBox("LIN ")
+    self.lin_from_line = pya.QLineEdit(self)
+    self.lin_from_line.setValidator(double_validator)
+    self.lin_from_line.setMaximumWidth(50)
+    self.lin_label_to = pya.QLabel("to", self)
+    self.lin_to_line = pya.QLineEdit(self)
+    self.lin_to_line.setValidator(double_validator)
+    self.lin_to_line.setMaximumWidth(50)
+    self.lin_label_step = pya.QLabel("step of", self)
+    self.lin_step_line = pya.QLineEdit(self)
+    self.lin_step_line.setValidator(double_validator)
+    self.lin_step_line.setMaximumWidth(50)
+    self.lin_label_unit = pya.QLabel("GHZ", self)
+    
+
+    layout_abs_settings.addWidget(self.abs_checkbox)
+    layout_abs_settings.addWidget(self.abs_from_line)
+    layout_abs_settings.addWidget(self.abs_label_to)
+    layout_abs_settings.addWidget(self.abs_to_line)
+    layout_abs_settings.addWidget(self.abs_label_unit)
+    layout_abs_settings.addStretch()
+    
+    layout_lin_settings.addWidget(self.lin_checkbox)
+    layout_lin_settings.addWidget(self.lin_from_line)
+    layout_lin_settings.addWidget(self.lin_label_to)
+    layout_lin_settings.addWidget(self.lin_to_line)
+    layout_lin_settings.addWidget(self.lin_label_step)
+    layout_lin_settings.addWidget(self.lin_step_line)
+    layout_lin_settings.addWidget(self.lin_label_unit)
+    layout_lin_settings.addStretch()
+    
+
+    layout_lin_settings.addWidget(self.lin_checkbox)
+
+    self.settings_window.setLayout(layout_modeling_settings)
+    layout_modeling_settings.addLayout(layout_abs_settings)
+    layout_modeling_settings.addLayout(layout_lin_settings)
+    self.layout_main.addWidget(self.settings_window)
+
+  def init_bottom_buttons(self):
+    layout_modeling_button = pya.QHBoxLayout(self)
+    layout_modeling_button.addStretch()
+
+    self.modeling_button = pya.QPushButton("Моделирование", self)
+    self.modeling_button.setMinimumHeight(27)
+    self.modeling_button.setMinimumWidth(150)
+    self.modeling_button.clicked(self.on_modeling_button)
+
+    layout_modeling_button.addWidget(self.modeling_button)
+    
+    self.layout_main.addLayout(layout_modeling_button)
+    
+# Методы сигналов    
+  def on_find_sonnet_button(self):
+    self.path_to_sonnet_line.text = Detective.file_processing()
+    
+  def on_modeling_button(self):
+    layout_name = pya.CellView().active().name
+
+    if self.check_find_line() == False:
+      return
+    if self.check_checkboxes() == False:
+      return
+    if self.check_layout() == False:
+      return
+    if self.abs_checkbox.isChecked():
+      if self.check_abs_lines() == False:
+        return
+    if self.lin_checkbox.isChecked():
+      if self.check_lin_lines() == False:
+        return
+    if self.check_existence() == False:
+      return
+  
+    proj = SonnetProject(layout_name, 
+     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
+     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
+     
+    proj.create_son_proj()
+
+    bat_modeling = BatModeling(layout_name, "/EM", self.path_to_sonnet_line.text)
+    bat_modeling.create_file()
+    
+  def on_open_action(self):
+    str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.*)")
+    return str
+    
+  def on_create_action(self):   
+    layout_name = pya.CellView().active().name
+
+    if self.check_find_line() == False:
+      return
+    if self.check_checkboxes() == False:
+      return
+    if self.check_layout() == False:
+      return
+    if self.abs_checkbox.isChecked():
+      if self.check_abs_lines() == False:
+        return
+    if self.lin_checkbox.isChecked():
+      if self.check_lin_lines() == False:
+        return
+    if self.check_existence() == False:
+      return
+
+    proj = SonnetProject(layout_name, 
+     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
+     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
+     
+    proj.create_son_proj()
+    
+  def on_exit_action(self):
+     self.close()
+
+# Методы обработки ошибок   
+  def check_find_line(self):
+    if len(self.path_to_sonnet_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка Sonnet")
+      error_msg.setText("Необходимо ввести путь до Sonnet!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_abs_lines(self):
+    if len(self.abs_from_line.text) == 0 or len(self.abs_to_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных ABS!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_lin_lines(self):
+    if len(self.lin_from_line.text) == 0 or len(self.lin_to_line.text) == 0 or len(self.lin_step_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных LIN!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_checkboxes(self):
+    if self.abs_checkbox.isChecked() == False and self.lin_checkbox.isChecked() == False:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо выбрать хотя бы один тип развертки!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_layout(self):
+    if (str(pya.CellView().active().layout()) == 'None'):
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка макета")
+      error_msg.setText("Необходимо создать \"Layout\"!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_existence(self):
+    layout_name = pya.CellView().active().name
+    RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+
+    cur_dir_path = RAW_PATH_TO_KLAYOUT + rf"\EM\{layout_name}\\"
+
+    if os.path.exists(cur_dir_path):
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Предупреждение")
+      error_msg.setText("Директория с данным именем уже существует, перезаписать её?")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setStandardButtons(pya.QMessageBox.Ok | pya.QMessageBox.Cancel)
+      return_value = error_msg.exec_()
+
+      if return_value == pya.QMessageBox.Ok:
+        shutil.rmtree(cur_dir_path)
+        return True
+      else:
+        return False
+
+dialog = EMDialog(pya.Application.instance().main_window())        
+def f():
+  dialog.show()
+
+# Добавление нового пунтка меню в KLayout
+a = pya.Action()
+a.title = "Электромагнитное моделирование"
+a.icon = r"salt\Niimes-lib\Niimes-tech\images\logo-01.png"
+a.icon_text = "EM-menu"
+a.on_triggered(f)
+  
+menu = pya.Application.instance().main_window().menu()
+menu.insert_separator("@toolbar.end", "name")
+menu.insert_item("@toolbar.end", "my_action", a)
+</text>
+</klayout-macro>
