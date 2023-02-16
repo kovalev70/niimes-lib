@@ -52,3 +52,5 @@ class Detective:
                 line_object.text = file.readline()
         except:
             line_object.placeholderText = r"Введите путь в формате: C:\Program Files\Sonnet Software\17.56\bin"
+
+

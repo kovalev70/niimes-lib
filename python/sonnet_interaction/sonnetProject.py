@@ -33,6 +33,7 @@ class BatFile:
 
         os.chdir(self.file_dir_path)
         os.system(f"start {self.file_name}")
+        os.chdir(RAW_PATH_TO_KLAYOUT)
         
 class BatModeling(BatFile):
     def __init__(self, file_name, local_path_to_dir, path_to_sonnet):
@@ -318,7 +319,7 @@ class GeometryBlock:
               region = pya.Region(shapes)
               layer_info = str(ly.get_info(i)).split()
               layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
-              print(region)
+
               if((len(str(region)) > 0) and (self.layer_filter(layer_son) == True)):
                     trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
                     r =[]

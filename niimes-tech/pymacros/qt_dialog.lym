@@ -173,28 +173,7 @@ class EMDialog(pya.QDialog):
     self.path_to_sonnet_line.text = Detective.file_processing()
     
   def on_modeling_button(self):
-    layout_name = pya.CellView().active().name
-
-    if self.check_find_line() == False:
-      return
-    if self.check_checkboxes() == False:
-      return
-    if self.check_layout() == False:
-      return
-    if self.abs_checkbox.isChecked():
-      if self.check_abs_lines() == False:
-        return
-    if self.lin_checkbox.isChecked():
-      if self.check_lin_lines() == False:
-        return
-    if self.check_existence() == False:
-      return
-  
-    proj = SonnetProject(layout_name, 
-     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
-     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
-     
-    proj.create_son_proj()
+    self.create_son()
 
     bat_modeling = BatModeling(layout_name, "/EM", self.path_to_sonnet_line.text)
     bat_modeling.create_file()
@@ -204,28 +183,7 @@ class EMDialog(pya.QDialog):
     return str
     
   def on_create_action(self):   
-    layout_name = pya.CellView().active().name
-
-    if self.check_find_line() == False:
-      return
-    if self.check_checkboxes() == False:
-      return
-    if self.check_layout() == False:
-      return
-    if self.abs_checkbox.isChecked():
-      if self.check_abs_lines() == False:
-        return
-    if self.lin_checkbox.isChecked():
-      if self.check_lin_lines() == False:
-        return
-    if self.check_existence() == False:
-      return
-
-    proj = SonnetProject(layout_name, 
-     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
-     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
-     
-    proj.create_son_proj()
+    self.create_son()
     
   def on_exit_action(self):
      self.close()
@@ -280,7 +238,7 @@ class EMDialog(pya.QDialog):
     layout_name = pya.CellView().active().name
     RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
-    cur_dir_path = RAW_PATH_TO_KLAYOUT + rf"\EM\{layout_name}\\"
+    cur_dir_path = RAW_PATH_TO_KLAYOUT + rf"\EM\{layout_name}"
 
     if os.path.exists(cur_dir_path):
       error_msg = pya.QMessageBox()
@@ -295,6 +253,32 @@ class EMDialog(pya.QDialog):
         return True
       else:
         return False
+
+# Создание Sonnet
+  def create_son(self):
+    layout_name = pya.CellView().active().name
+
+    if self.check_find_line() == False:
+      return
+    if self.check_checkboxes() == False:
+      return
+    if self.check_layout() == False:
+      return
+    if self.abs_checkbox.isChecked():
+      if self.check_abs_lines() == False:
+        return
+    if self.lin_checkbox.isChecked():
+      if self.check_lin_lines() == False:
+        return
+    if self.check_existence() == False:
+      return
+
+    proj = SonnetProject(layout_name, 
+     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
+     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
+     
+    proj.create_son_proj()
+    Detective.save_path(self.path_to_sonnet_line.text)
 
 dialog = EMDialog(pya.Application.instance().main_window())        
 def f():
