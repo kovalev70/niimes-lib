@@ -23,7 +23,7 @@ import shutil
 
 class EMDialog(pya.QDialog):
   def __init__(self, parent = None):
-    super(EMDialog, self).__init__()
+    super(EMDialog, self).__init__() 
     self.init_ui()
     
   def init_ui(self):  
@@ -110,7 +110,7 @@ class EMDialog(pya.QDialog):
     self.abs_from_line = pya.QLineEdit(self)
     self.abs_from_line.setValidator(double_validator)
     self.abs_from_line.setMaximumWidth(50)
-    self.abs_label_to = pya.QLabel("to", self)
+    self.abs_label_to = pya.QLabel("до", self)
     self.abs_to_line = pya.QLineEdit(self)
     self.abs_to_line.setValidator(double_validator)
     self.abs_to_line.setMaximumWidth(50)
@@ -120,11 +120,11 @@ class EMDialog(pya.QDialog):
     self.lin_from_line = pya.QLineEdit(self)
     self.lin_from_line.setValidator(double_validator)
     self.lin_from_line.setMaximumWidth(50)
-    self.lin_label_to = pya.QLabel("to", self)
+    self.lin_label_to = pya.QLabel("до", self)
     self.lin_to_line = pya.QLineEdit(self)
     self.lin_to_line.setValidator(double_validator)
     self.lin_to_line.setMaximumWidth(50)
-    self.lin_label_step = pya.QLabel("step of", self)
+    self.lin_label_step = pya.QLabel("с шагом", self)
     self.lin_step_line = pya.QLineEdit(self)
     self.lin_step_line.setValidator(double_validator)
     self.lin_step_line.setMaximumWidth(50)
@@ -183,8 +183,9 @@ class EMDialog(pya.QDialog):
     str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.*)")
     return str
     
-  def on_create_action(self):   
-    self.create_son()
+  def on_create_action(self):
+    layout_name = pya.CellView().active().name 
+    self.create_son(layout_name)
     
   def on_exit_action(self):
      self.close()
