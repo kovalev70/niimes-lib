@@ -174,9 +174,10 @@ class EMDialog(pya.QDialog):
     
   def on_modeling_button(self):
     layout_name = pya.CellView().active().name
-    self.create_son(layout_name)
+    if self.create_son(layout_name) == False:
+      return False
 
-    bat_modeling = BatModeling(layout_name, "/EM", self.path_to_sonnet_line.text)
+    bat_modeling = BatModeling(layout_name, "\EM", self.path_to_sonnet_line.text)
     bat_modeling.create_file()
     
   def on_open_action(self):
@@ -259,19 +260,19 @@ class EMDialog(pya.QDialog):
 # Создание Sonnet
   def create_son(self, layout_name):
     if self.check_find_line() == False:
-      return
-    if self.check_checkboxes() == False:
-      return
+      return False
     if self.check_layout() == False:
-      return
+      return False
+    if self.check_checkboxes() == False:
+      return False
     if self.abs_checkbox.isChecked():
       if self.check_abs_lines() == False:
-        return
+        return False
     if self.lin_checkbox.isChecked():
       if self.check_lin_lines() == False:
-        return
+        return False
     if self.check_existence() == False:
-      return
+      return False
 
     proj = SonnetProject(layout_name, 
      self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
