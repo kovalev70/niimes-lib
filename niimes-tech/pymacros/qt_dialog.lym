@@ -37,6 +37,7 @@ class EMDialog(pya.QDialog):
     self.init_menu()
     self.init_find()
     self.init_modeling_settings()
+    self.init_cell_size()
     self.init_bottom_buttons()
     
 # Элементы диалогового окна        
@@ -168,6 +169,48 @@ class EMDialog(pya.QDialog):
     
     self.layout_main.addLayout(layout_modeling_button)
     
+  def init_cell_size(self):
+    layout_box_settings = pya.QVBoxLayout(self)
+
+    layout_xcell_settings = pya.QHBoxLayout(self)
+    layout_ycell_settings = pya.QHBoxLayout(self)
+
+    self.settings_window = pya.QGroupBox("Настройки размера ячеек", self)
+    
+    
+    double_validator = pya.QDoubleValidator(self)
+    double_validator.setNotation(pya.QDoubleValidator.StandardNotation)
+    double_validator.setBottom(1)
+    double_validator.setDecimals(4)
+    
+    self.xcell_label = pya.QLabel("Размер ячейки по X", self)
+    self.xcell_from_line = pya.QLineEdit(self)
+    self.xcell_label_unit = pya.QLabel("мкм", self)
+    self.xcell_from_line.setValidator(double_validator)
+    self.xcell_from_line.setMaximumWidth(50)
+    
+    self.ycell_label = pya.QLabel("Размер ячейки по Y", self)
+    self.ycell_from_line = pya.QLineEdit(self)
+    self.ycell_label_unit = pya.QLabel("мкм", self)
+    self.ycell_from_line.setValidator(double_validator)
+    self.ycell_from_line.setMaximumWidth(50)
+    
+    
+    layout_xcell_settings.addWidget(self.xcell_label)
+    layout_xcell_settings.addWidget(self.xcell_from_line)
+    layout_xcell_settings.addWidget(self.xcell_label_unit)
+    layout_xcell_settings.addStretch()
+    
+    layout_ycell_settings.addWidget(self.ycell_label)
+    layout_ycell_settings.addWidget(self.ycell_from_line)
+    layout_ycell_settings.addWidget(self.ycell_label_unit)
+    layout_ycell_settings.addStretch()
+
+    self.settings_window.setLayout(layout_box_settings)
+    layout_box_settings.addLayout(layout_xcell_settings)
+    layout_box_settings.addLayout(layout_ycell_settings)
+    self.layout_main.addWidget(self.settings_window)
+    
 # Методы сигналов    
   def on_find_sonnet_button(self):
     self.path_to_sonnet_line.text = Detective.file_processing()
@@ -236,7 +279,16 @@ class EMDialog(pya.QDialog):
       error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
       error_msg.exec_()
       return False
-
+      
+  def check_box_settings(self):
+    if len(self.xcell_from_line.text) == 0 or len(self.ycell_from_line.text) == 0 or float(self.xcell_from_line.text.replace(',','.')) &lt;= 0 or float(self.ycell_from_line.text.replace(',','.')) &lt;= 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных размеров ячеек!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.exec_()
+      return False
+    
   def check_existence(self):
     layout_name = pya.CellView().active().name
     RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
@@ -256,7 +308,7 @@ class EMDialog(pya.QDialog):
         return True
       else:
         return False
-
+  
 # Создание Sonnet
   def create_son(self, layout_name):
     if self.check_find_line() == False:
@@ -271,12 +323,15 @@ class EMDialog(pya.QDialog):
     if self.lin_checkbox.isChecked():
       if self.check_lin_lines() == False:
         return False
-    if self.check_existence() == False:
+    if self.check_box_settings() == False:
       return False
+    if self.check_existence() == False:
+      return False 
 
     proj = SonnetProject(layout_name, 
      self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
-     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, self.lin_step_line.text)
+     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, 
+     self.lin_step_line.text, self.xcell_from_line.text, self.ycell_from_line.text)
      
     proj.create_son_proj()
 

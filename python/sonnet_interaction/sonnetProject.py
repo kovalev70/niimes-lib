@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import pya
+import math
 
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
@@ -91,10 +92,12 @@ class ControlBlock:
         ]
 
 class GeometryBlock:
-    def __init__(self):
+    def __init__(self, xcell, ycell):
         self.x_min = sys.maxsize
         self.y_min = sys.maxsize
         self.box = self.box_size()
+        xcell = float(xcell.replace(',','.'))
+        ycell = float(ycell.replace(',','.'))
         self.text= [
             "GEO",
             "MET \"EM_MET2_Bridge\" 6 TMM 41000000 0.5 5 2",
@@ -105,7 +108,7 @@ class GeometryBlock:
             "MET \"TFR1\" 1 RES 50",
             "MET \"Met0via\" 2 VOL INF SOLID 0",
             "MET \"BackVia\" 1 VOL 41000000 10",
-            f"BOX 5 {self.box[0]} {int(self.box[1]*1.5)} {int(self.box[0]*4)} {int(int(self.box[1]*1.5) * 4)} 20 0",
+            f"BOX 5 {self.box[0]} {math.ceil(self.box[1]*1.5)} {int(self.box[0] / xcell) * 2} {math.ceil(math.ceil(self.box[1]*1.5) / float(ycell)) * 2} 20 0",
             "      500 1 1 0 0 0 0 \"Air\"",
             "      3 2.65 1 0.0008 0 0 0 \"BCB\"",
             "      3.5 2.65 1 0.0008 0 0 0 \"BCB\"",
@@ -113,7 +116,6 @@ class GeometryBlock:
             "      0.22 7.5 1 0.001 0 0 0 \"SINx\"",
             "      85 12.9 1 0.001 0 0 0 \"GaAs\""
         ]
-        
         self.creating_geometry() 
            
     def custom_make_translation(self, text, translation):
@@ -198,8 +200,7 @@ class GeometryBlock:
                                   
                               if (y > y_max):
                                   y_max = y
-
-                                    
+                            
         box = [x_max, y_max]       
         return box
         
@@ -268,9 +269,9 @@ class GeometryBlock:
                             x = float(text.x) * layout.dbu - abs(self.x_min)
                             
                         if(float(self.y_min) < 0):
-                            y = 1.5 * self.box[1] - (layout.dbu * (float(text.y) + abs(self.y_min)) - (self.box[1]*0.25))
+                            y = math.ceil(1.5 * self.box[1]) - (layout.dbu * (float(text.y)) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                         else:
-                            y = 1.5 * self.box[1] - (layout.dbu * (float(text.y) - abs(self.y_min)) - (self.box[1]*0.25))
+                            y = math.ceil(1.5 * self.box[1]) - (layout.dbu * (float(text.y)) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                             
                         self.text.append("POR1 BOX") 
                         self.text.append(f"POLY {iPolygon} 1")
@@ -292,6 +293,10 @@ class GeometryBlock:
             si.next()
         
     def creating_geometry(self):
+        exception_num = 0
+        if(self.box[1] <= 1.5):
+            exception_num = 0.25 
+            
         cv = pya.CellView().active()
         ly = cv.layout()
         num = 0
@@ -355,12 +360,11 @@ class GeometryBlock:
                                 else:
 
                                     if(float(self.y_min) < 0):
-                                        y = 1.5 * self.box[1] - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (self.box[1]*0.25)
+                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                                     else:
-                                        y = 1.5 * self.box[1] - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (self.box[1]*0.25)
-                                        
+                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2          
                             self.text.append(f"{x} {y}")
-
+                            
                             if(l == (points_count*2 - 4)):
                                 if (float(self.x_min) < 0):
                                     x = float(point[0]) * ly.dbu + abs(self.x_min)
@@ -368,12 +372,12 @@ class GeometryBlock:
                                     x = float(point[0]) * ly.dbu - abs(self.x_min)
                                     
                                 if(float(self.y_min) < 0):
-                                    y = 1.5 * self.box[1] - (ly.dbu * (float(point[1])) + abs(self.y_min)) - (self.box[1]*0.25)
+                                    y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                                 else:
-                                    y = 1.5 * self.box[1] - (ly.dbu * (float(point[1])) - abs(self.y_min)) - (self.box[1]*0.25)
-                                    
+                                    y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
+  
                                 self.text.append(f"{x} {y}") 
-                                
+                                        
                         self.text.append("END")             
         self.text.append("END GEO")
 
@@ -434,7 +438,8 @@ class FileBlock:
 class SonnetProject:
     def __init__(self, file_name,
      abs_status = False, abs_from = 0, abs_to = 0, 
-     lin_status = False, lin_from = 0, lin_to = 0, lin_step = 0):
+     lin_status = False, lin_from = 0, lin_to = 0, lin_step = 0,
+     xcell = 0, ycell = 0):
 
         self.file_name = file_name
 
@@ -445,7 +450,7 @@ class SonnetProject:
         self.header = HeaderBlock()
         self.dimensions = DimensionsBlock()
         self.control = ControlBlock()
-        self.geometry = GeometryBlock()
+        self.geometry = GeometryBlock(xcell, ycell)
         self.sweep = SweepBlock(abs_status, abs_from, abs_to, lin_status, lin_from, lin_to, lin_step)
         self.file = FileBlock()
 
