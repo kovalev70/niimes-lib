@@ -4,6 +4,7 @@ import re
 import sys
 import pya
 import math
+
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class Handler:
@@ -361,8 +362,7 @@ class GeometryBlock:
                                     if(float(self.y_min) < 0):
                                         y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                                     else:
-                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
-                            print(y)            
+                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2          
                             self.text.append(f"{x} {y}")
                             
                             if(l == (points_count*2 - 4)):
