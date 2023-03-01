@@ -40,10 +40,7 @@ class Detective:
         if os.path.exists(self.RAW_PATH_TO_KLAYOUT + "\EM") == False:
             os.mkdir(self.RAW_PATH_TO_KLAYOUT + "\EM")
 
-        if os.path.exists(self.FILE_PATH):
-            return self.__get_path_from_file(self.FILE_PATH, os.path.exists(self.FILE_PATH))
-        else:
-            return self.__get_path_from_file(self.FILE_PATH, os.path.exists(self.FILE_PATH))
+        return self.__get_path_from_file(self.FILE_PATH, os.path.exists(self.FILE_PATH))
 
     @classmethod
     def line_cheker(self, line_object):
