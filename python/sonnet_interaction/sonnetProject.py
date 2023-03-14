@@ -4,7 +4,6 @@ import re
 import sys
 import pya
 import math
-
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class Handler:
@@ -117,7 +116,8 @@ class GeometryBlock:
             "      85 12.9 1 0.001 0 0 0 \"GaAs\""
         ]
         self.creating_geometry() 
-           
+        
+    @classmethod        
     def custom_make_translation(self, text, translation):
         regex = re.compile('|'.join(map(re.escape, translation)))
         return regex.sub(lambda match: translation[match.group(0)], text)
@@ -128,78 +128,78 @@ class GeometryBlock:
         x_max = 0
         y_max = 0
         box = []
-        for cell in ly.each_cell():
-           for i in range(0, ly.layers()):
-              shapes = cell.shapes(i)
-              region = pya.Region(shapes)
-              trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
-                                  '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
-              layer_info = str(ly.get_info(i)).split()
-              layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
-              
-              if((len(str(region)) > 0) and (self.layer_filter(layer_son) == True)):
-                    trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
-                    r =[]
+        layer_indxs = ly.layer_indexes()
+        cell = ly.top_cell()
+        trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
+                              '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
+        
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers) 
+            
+            if (self.layer_filter(layer_son) == True):
+                shapes = cell.begin_shapes_rec(i)
+                region = pya.Region(shapes)
+                trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
+                r =[]
                     
-                    for i in region:
-                        r.append(self.custom_make_translation(str(i), trans_table_r))
+                for l in region:
+                    r.append(self.custom_make_translation(str(l), trans_table_r))
+                        
+                for j in range(0, len(r)):
+                    points_count = 2 * (((len(re.findall(" ",r[j])))//2) + 1)
+                    point = []
+                    point = r[j].split(' ')
+                        
+                    for l in range(0, points_count):
+                        x = sys.maxsize
+                        y = sys.maxsize
+                        if (l % 2 == 0):   
+                            x = float(point[l]) * ly.dbu 
+                        else:
+                            y = ly.dbu * (float(point[l]))
+                        if (x < self.x_min):
+                            self.x_min = x
+                        if (y < self.y_min):
+                            self.y_min = y
+                                
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
+
+            if (self.layer_filter(layer_son) == True):
+                shapes = cell.begin_shapes_rec(i)
+                region = pya.Region(shapes)
+                trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
+                r =[]
+                    
+                for l in region:
+                    r.append(self.custom_make_translation(str(l), trans_table_r))
+                      
+                    x = 0
+                    y = 0
                         
                     for j in range(0, len(r)):
-                        points_count = 2 * (((len(re.findall(" ",r[j])))//2) + 1)
+                        points_count= 2 * (((len(re.findall(" ",r[j])))//2) + 1)
                         point = []
                         point = r[j].split(' ')
-                        
-                        for l in range(0, points_count):
-                            x = sys.maxsize
-                            y = sys.maxsize
-                            if(l % 2 == 0):   
-                                x = float(point[l]) * ly.dbu 
-                            else:
-                                y = ly.dbu * (float(point[l]))
-                            if(x < self.x_min):
-                                self.x_min = x
-                            if(y < self.y_min):
-                                self.y_min = y
-                                
-           for i in range(0, ly.layers()):
-              shapes = cell.shapes(i)
-              region = pya.Region(shapes)
-              trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
-                                  '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
-              layer_info = str(ly.get_info(i)).split()
-              layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
-              
-              if((len(str(region)) > 0) and (self.layer_filter(layer_son) == True)):
-                  trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
-                  r =[]
-                    
-                  for i in region:
-                      r.append(self.custom_make_translation(str(i), trans_table_r))
-                      
-                      x = 0
-                      y = 0
-                        
-                      for j in range(0, len(r)):
-                          points_count= 2 * (((len(re.findall(" ",r[j])))//2) + 1)
-                          point = []
-                          point = r[j].split(' ')
   
-                          for l in range(0, points_count):
-                              if(l % 2 == 0):
-                                  if(self.x_min < 0):
-                                      x = float(point[l]) * ly.dbu + abs(self.x_min)
-                                  else:
-                                      x = float(point[l]) * ly.dbu - abs(self.x_min)
-                              else:
-                                  if(self.y_min < 0):
-                                      y = ly.dbu * (float(point[l])) + abs(self.y_min)
-                                  else:
-                                      y = ly.dbu * (float(point[l])) - abs(self.y_min)
-                              if (x > x_max):
-                                  x_max = x
+                        for l in range(0, points_count):
+                            if(l % 2 == 0):
+                                if (self.x_min < 0):
+                                    x = float(point[l]) * ly.dbu + abs(self.x_min)
+                                else:
+                                    x = float(point[l]) * ly.dbu - abs(self.x_min)
+                            else:
+                                if (self.y_min < 0):
+                                    y = ly.dbu * (float(point[l])) + abs(self.y_min)
+                                else:
+                                    y = ly.dbu * (float(point[l])) - abs(self.y_min)
+                            if (x > x_max):
+                                x_max = x
                                   
-                              if (y > y_max):
-                                  y_max = y
+                            if (y > y_max):
+                                y_max = y
                             
         box = [x_max, y_max]       
         return box
@@ -232,31 +232,40 @@ class GeometryBlock:
         elif (layer == 'Via2'):
             return 3
             
+    @classmethod        
     def layer_filter(self, layer):
         if (layer == 'Met2u' or layer == 'Met1u' or layer == 'TFR1' or layer == 'TFR2' or layer == 'TFR3' or layer == 'Via2'):
             return True  
         else: 
             return False
             
-    def ports(self, layer_index, cell, layout, polygon_index):
-        si = layout.cell(cell.name).begin_shapes_rec(layer_index)
+    def ports(self, layer_index, layout, polygon_index):
+        cell = layout.top_cell()
+        box_shapes = layout.cell(cell.name).begin_shapes_rec(layer_index)
         x_coords_left = []
         x_coords_right = []
         y_coords_bottom = []
         y_coords_top = []
         count_polygon = 0
-        while not si.at_end():
-            iPolygon = polygon_index 
-            text = si.shape().text
-            bbox = si.shape().bbox().transformed(si.trans())
-            
+        
+        while not box_shapes.at_end():
+            iPolygon = polygon_index
+            text = box_shapes.shape().text
+            bbox = box_shapes.shape().bbox().transformed(box_shapes.trans())
             if (str(text) == 'None'):
                 count_polygon += 1
                 x_coords_left.append(bbox.left)
                 x_coords_right.append(bbox.right)
                 y_coords_bottom.append(bbox.bottom)
                 y_coords_top.append(bbox.top)
-            else:
+            box_shapes.next()
+
+        text_shapes = layout.cell(cell.name).begin_shapes_rec(layer_index)
+
+        while not text_shapes.at_end():
+            iPolygon = polygon_index
+            text = text_shapes.shape().text
+            if (str(text) != 'None'):
                 for i in range(0, count_polygon):
                     iPolygon += 1
                     is_port_vertical = ((text.y == y_coords_bottom[i] or text.y == y_coords_top[i]) and (text.x >= x_coords_left[i] and text.x <= x_coords_right[i]))
@@ -268,7 +277,7 @@ class GeometryBlock:
                         else:
                             x = float(text.x) * layout.dbu - abs(self.x_min)
                             
-                        if(float(self.y_min) < 0):
+                        if (float(self.y_min) < 0):
                             y = math.ceil(1.5 * self.box[1]) - (layout.dbu * (float(text.y)) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                         else:
                             y = math.ceil(1.5 * self.box[1]) - (layout.dbu * (float(text.y)) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
@@ -276,109 +285,105 @@ class GeometryBlock:
                         self.text.append("POR1 BOX") 
                         self.text.append(f"POLY {iPolygon} 1")
                         
-                        if(is_port_vertical and text.y == y_coords_top[i]):
+                        if (is_port_vertical and text.y == y_coords_top[i]):
                             self.text.append("1")
                             
-                        elif(is_port_vertical and text.y == y_coords_bottom[i]):
+                        elif (is_port_vertical and text.y == y_coords_bottom[i]):
                             self.text.append("3")
                         
-                        if(is_port_lateral and text.x == x_coords_left[i]):
+                        if (is_port_lateral and text.x == x_coords_left[i]):
                             self.text.append("0")
                             
-                        elif(is_port_lateral and text.x == x_coords_right[i]):
+                        elif (is_port_lateral and text.x == x_coords_right[i]):
                             self.text.append("2")
                         
                         self.text.append(f"{text.string} 50 0 0 0 {x} {y} ")
                 
-            si.next()
+            text_shapes.next()
         
-    def creating_geometry(self):
-        exception_num = 0
-        if(self.box[1] <= 1.5):
-            exception_num = 0.25 
-            
+    def creating_geometry(self):     
         cv = pya.CellView().active()
         ly = cv.layout()
+        cell = ly.top_cell()
         num = 0
+        polygon_index = 0
         trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
                                   '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
-        for cell in ly.each_cell():
-            for i in range(0, ly.layers()):
-                shapes = cell.shapes(i)
+        layer_indxs = ly.layer_indexes()
+        
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers) 
+            
+            if (self.layer_filter(layer_son) == True):
+                shapes = cell.begin_shapes_rec(i)
                 region = pya.Region(shapes)
-                layer_info = str(ly.get_info(i)).split()
-                layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
+                self.ports(i, ly, num)  
+                num += len(region)
                 
-                if((len(str(region)) > 0) and (self.layer_filter(layer_son) == True)):
-                    self.ports(i, cell, ly, num)
-                    num += len(region)
-                
-        if(num > 0):
+        if (num > 0):
             self.text.append(f"NUM {str(num)}")
         
-        for cell in ly.each_cell():
-           polygon_index = 0
-           
-           for i in range(0, ly.layers()):
-              shapes = cell.shapes(i)
-              region = pya.Region(shapes)
-              layer_info = str(ly.get_info(i)).split()
-              layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = self.custom_make_translation(str(layer_info[0]), trans_table_layers)
+            
+            if (self.layer_filter(layer_son) == True):
+                shapes = cell.begin_shapes_rec(i)
+                region = pya.Region(shapes)
+                trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
+                r =[]
 
-              if((len(str(region)) > 0) and (self.layer_filter(layer_son) == True)):
-                    trans_table_r = {');': None, '(': None, ',': ' ', ';': ' ', ')': None}
-                    r =[]
-                    for i in region:
-                        r.append(self.custom_make_translation(str(i), trans_table_r))
+                for l in region:
+                    r.append(self.custom_make_translation(str(l), trans_table_r))
                         
-                    for j in range(0, len(region)):
-                        polygon_index += 1
-                        points_count= ((len(re.findall(" ",r[j])))//2) + 2
-                        toLevel = 0
-                        point = []
-                        point = r[j].split(' ')
-                        if(layer_son == 'Via2'):
-                            toLevel = 2
-                            self.text.append("VIA POLYGON")    
+                for j in range(0, len(region)):
+                    polygon_index += 1
+                    points_count= ((len(re.findall(" ",r[j])))//2) + 2
+                    toLevel = 0
+                    point = []
+                    point = r[j].split(' ')
+                    if (layer_son == 'Via2'):
+                        toLevel = 2
+                        self.text.append("VIA POLYGON")    
                             
-                        self.text.append(f"{self.ilevel(layer_son)} {points_count} {self.mtype(layer_son)} V {polygon_index} 1 1 100 100 0 0 0 Y")
+                    self.text.append(f"{self.ilevel(layer_son)} {points_count} {self.mtype(layer_son)} V {polygon_index} 1 1 100 100 0 0 0 Y")
                         
-                        if(layer_son == 'Via2'):
-                            self.text.append(f"TOLEVEL {toLevel} SOLID NOCOVERS")
-                            self.text.append(f"TLAYNAM {layer_son} NOH") 
-                        else:
-                            self.text.append(f"TLAYNAM {layer_son} INH")    
+                    if (layer_son == 'Via2'):
+                        self.text.append(f"TOLEVEL {toLevel} SOLID NOCOVERS")
+                        self.text.append(f"TLAYNAM {layer_son} NOH") 
+                    else:
+                        self.text.append(f"TLAYNAM {layer_son} INH")    
                              
-                        for l in range(0, points_count*2 - 2, 2):
-                            for n in range(0, 2):
-                                if(n == 0):
+                    for l in range(0, points_count*2 - 2, 2):
+                        for n in range(0, 2):
+                            if(n == 0):
 
-                                    if (float(self.x_min) < 0):
-                                        x = float(point[l+n]) * ly.dbu + abs(self.x_min)
-                                    else:
-                                        x = float(point[l+n]) * ly.dbu - abs(self.x_min)
-                                else:
-
-                                    if(float(self.y_min) < 0):
-                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
-                                    else:
-                                        y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2          
-                            self.text.append(f"{x} {y}")
-                            
-                            if(l == (points_count*2 - 4)):
                                 if (float(self.x_min) < 0):
-                                    x = float(point[0]) * ly.dbu + abs(self.x_min)
+                                    x = float(point[l+n]) * ly.dbu + abs(self.x_min)
                                 else:
-                                    x = float(point[0]) * ly.dbu - abs(self.x_min)
-                                    
-                                if(float(self.y_min) < 0):
+                                    x = float(point[l+n]) * ly.dbu - abs(self.x_min)
+                            else:
+
+                                if (float(self.y_min) < 0):
                                     y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
                                 else:
-                                    y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
+                                    y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2          
+                        self.text.append(f"{x} {y}")
+                            
+                        if(l == (points_count*2 - 4)):
+                            if (float(self.x_min) < 0):
+                                x = float(point[0]) * ly.dbu + abs(self.x_min)
+                            else:
+                                x = float(point[0]) * ly.dbu - abs(self.x_min)
+                                    
+                            if (float(self.y_min) < 0):
+                                y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) + abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
+                            else:
+                                y = math.ceil(1.5 * self.box[1]) - (ly.dbu * (float(point[l+n])) - abs(self.y_min)) - (math.ceil(1.5* self.box[1]) - self.box[1])/2
   
-                                self.text.append(f"{x} {y}") 
-                                        
-                        self.text.append("END")             
+                            self.text.append(f"{x} {y}")           
+                    self.text.append("END")             
         self.text.append("END GEO")
 
 class SweepBlock:
@@ -417,21 +422,27 @@ class FileBlock:
         count = 0
         cv = pya.CellView().active()
         ly = cv.layout()
+        cell = ly.top_cell()
+        layer_indxs = ly.layer_indexes()
+        trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
+                                  '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
+         
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = GeometryBlock.custom_make_translation(str(layer_info[0]), trans_table_layers)  
+            shapes = cell.shapes(i)
+            r = pya.Region(shapes)
             
-        for cell in ly.each_cell():
-            for i in range(0, ly.layers()):
-                shapes = cell.shapes(i)
-                r = pya.Region(shapes)
-                if(len(str(r)) > 0):
-                    si = ly.cell(cell.name).begin_shapes_rec(i)
+            if (len(str(r)) > 0 and (GeometryBlock.layer_filter(layer_son) == True)):
+                si = ly.cell(cell.name).begin_shapes_rec(i)
+                        
+                while not si.at_end():
+                    text = si.shape().text
                             
-                    while not si.at_end():
-                        text = si.shape().text
+                    if (str(text) != 'None'):
+                        count += 1
                                 
-                        if (str(text) != 'None'):
-                            count += 1
-                                    
-                        si.next()
+                    si.next()
                             
         return count
 
