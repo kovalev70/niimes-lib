@@ -410,41 +410,13 @@ class SweepBlock:
 
 class FileBlock:
     def __init__(self):
-        self.number_ports = self.__ports_count()
+        self.number_ports = ports_count()
         self.text = [
             "FILEOUT",
             f"TOUCH D Y $BASENAME.s{self.number_ports}p IC 15 S MA R 50.00000",
             "FOLDER .",
             "END FILEOUT"
         ]
-
-    def __ports_count(self):
-        count = 0
-        cv = pya.CellView().active()
-        ly = cv.layout()
-        cell = ly.top_cell()
-        layer_indxs = ly.layer_indexes()
-        trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
-                                  '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
-         
-        for i in layer_indxs:
-            layer_info = str(ly.get_info(i)).split()
-            layer_son = GeometryBlock.custom_make_translation(str(layer_info[0]), trans_table_layers)  
-            shapes = cell.shapes(i)
-            r = pya.Region(shapes)
-            
-            if (len(str(r)) > 0 and (GeometryBlock.layer_filter(layer_son) == True)):
-                si = ly.cell(cell.name).begin_shapes_rec(i)
-                        
-                while not si.at_end():
-                    text = si.shape().text
-                            
-                    if (str(text) != 'None'):
-                        count += 1
-                                
-                    si.next()
-                            
-        return count
 
 class SonnetProject:
     def __init__(self, file_name,
@@ -486,3 +458,30 @@ class SonnetProject:
             
         Handler.insert_nested_list_to_file(cur_dir_path + f"\{self.file_name}.son", self.params)
 
+def ports_count():
+        count = 0
+        cv = pya.CellView().active()
+        ly = cv.layout()
+        cell = ly.top_cell()
+        layer_indxs = ly.layer_indexes()
+        trans_table_layers = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
+                                  '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
+         
+        for i in layer_indxs:
+            layer_info = str(ly.get_info(i)).split()
+            layer_son = GeometryBlock.custom_make_translation(str(layer_info[0]), trans_table_layers)  
+            shapes = cell.shapes(i)
+            r = pya.Region(shapes)
+            
+            if (len(str(r)) > 0 and (GeometryBlock.layer_filter(layer_son) == True)):
+                si = ly.cell(cell.name).begin_shapes_rec(i)
+                        
+                while not si.at_end():
+                    text = si.shape().text
+                            
+                    if (str(text) != 'None'):
+                        count += 1
+                                
+                    si.next()
+                            
+        return count

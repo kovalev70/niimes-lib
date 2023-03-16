@@ -17,9 +17,12 @@
  <dsl-interpreter-name/>
  <text>from sonnet_interaction.sonnetProject import *
 from sonnet_interaction.detective import *
+from sonnet_interaction.plot import *
+
 import pya
 import os
 import shutil
+import re
 
 class EMDialog(pya.QDialog):
   def __init__(self, parent = None):
@@ -224,8 +227,14 @@ class EMDialog(pya.QDialog):
     bat_modeling.create_file()
     
   def on_open_action(self):
-    str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.*)")
-    return str
+    str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.s**p)")
+    _, file_extension = os.path.splitext(str)
+    regex_num = re.compile("\d+")
+    num_ports = regex_num.findall(file_extension)
+
+    plot_dialog = PlotDialog(int(num_ports[0]), str, pya.Application.instance().main_window()) 
+    plot_dialog.show()
+    plot_dialog.exec_()
     
   def on_create_action(self):
     layout_name = pya.CellView().active().name 
@@ -335,9 +344,104 @@ class EMDialog(pya.QDialog):
      
     proj.create_son_proj()
 
-dialog = EMDialog(pya.Application.instance().main_window())        
+class PlotDialog(pya.QDialog):
+  def __init__(self, num_ports, path, parent = None):
+    super().__init__()
+    self.num_ports = num_ports
+    self.path = path
+
+    self.format_text = "DB"
+
+    self.init_ui()
+
+  def init_ui(self):
+    self.setWindowTitle("Построение графиков")
+    self.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\plot.png"))
+    self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
+    
+    self.layout_main = pya.QVBoxLayout(self)
+    self.layout_main.setContentsMargins(10, 10, 10, 10)
+
+    self.init_plot_settings()
+
+  def init_plot_settings(self):
+    layout_settings = pya.QVBoxLayout(self)
+
+    layout_ports_settings = pya.QHBoxLayout(self)
+    layout_format_settings = pya.QHBoxLayout(self)
+    layout_plot_button = pya.QHBoxLayout(self)
+    self.settings_window = pya.QGroupBox("Настройки отображения", self)
+    
+    i = self.num_ports
+
+    self.from_port_label = pya.QLabel("Порты:   из", self)
+    self.from_port = pya.QComboBox()
+    self.from_port.setMinimumWidth(40)
+    self.from_port.currentIndexChanged(self.from_handle_current_index)
+    
+    self.to_port_label = pya.QLabel("в", self)
+    self.to_port = pya.QComboBox()
+    self.to_port.setMinimumWidth(40)
+    self.to_port.currentIndexChanged(self.to_handle_current_index)
+
+    while i &gt; 0:
+      self.from_port.addItem(f"{i}")
+      self.to_port.addItem(f"{i}")
+      i -= 1
+
+    self.format_label = pya.QLabel("Формат:     ", self)
+    self.format = pya.QComboBox(self)
+    self.format.addItems(["DB", "MAG", "ANG", "RAD", "RE", "IM"])
+    self.format.setMinimumWidth(40)
+    self.format.currentIndexChanged(self.format_handle_current_index)
+
+    layout_ports_settings.addWidget(self.from_port_label)
+    layout_ports_settings.addWidget(self.from_port)
+    layout_ports_settings.addWidget(self.to_port_label)
+    layout_ports_settings.addWidget(self.to_port)
+    layout_ports_settings.addStretch()
+
+    layout_format_settings.addWidget(self.format_label)
+    layout_format_settings.addWidget(self.format)
+    layout_format_settings.addStretch()
+
+    self.plot_button = pya.QPushButton("Построить график", self)
+    self.plot_button.setMinimumHeight(27)
+    self.plot_button.setMinimumWidth(150)
+    self.plot_button.clicked(self.on_plot_button)
+
+    layout_settings.addLayout(layout_ports_settings)
+    layout_settings.addLayout(layout_format_settings)
+
+    self.settings_window.setLayout(layout_settings)
+
+    layout_plot_button.addWidget(self.plot_button)
+    layout_plot_button.addStretch()
+
+    self.layout_main.addWidget(self.settings_window)
+    self.layout_main.addLayout(layout_plot_button)
+
+  def to_handle_current_index(self, index):
+    self.to_port_text = self.to_port.itemText(index)  
+  
+  def from_handle_current_index(self, index):
+    self.from_port_text = self.from_port.itemText(index)
+
+  def format_handle_current_index(self, index):
+    self.format_text = self.format.itemText(index)
+
+  def on_plot_button(self):
+    print(self.path)
+    print(self.format_text)
+    print(self.from_port_text)
+    print(self.to_port_text)
+    plot = Touchstone(self.path, self.from_port_text, self.to_port_text, self.format_text)
+    plot.create_plot()
+
 def f():
+  dialog = EMDialog(pya.Application.instance().main_window()) 
   dialog.show()
+  dialog.exec_()
 
 # Добавление нового пунтка меню в KLayout
 a = pya.Action()
