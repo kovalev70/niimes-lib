@@ -4,6 +4,7 @@ import numpy as npy
 import math
 import pya
 import os
+
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class Touchstone(pya.QDialog):
@@ -270,6 +271,9 @@ class Touchstone(pya.QDialog):
         return npy.imag(z)
            
     def create_plot(self):
+        if os.path.exists(RAW_PATH_TO_KLAYOUT + "\EM") == False:
+            os.mkdir(RAW_PATH_TO_KLAYOUT + "\EM")
+
         freq, sparameter = self.get_sparameter_arrays()
         txt_file = open(RAW_PATH_TO_KLAYOUT+ f"\EM\gnuplotData.txt", "w+")
         path_to_data = txt_file.name.replace('\\', '/')
