@@ -24,6 +24,8 @@ import os
 import shutil
 import re
 
+RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+
 class EMDialog(pya.QDialog):
   def __init__(self, parent = None):
     super(EMDialog, self).__init__() 
@@ -431,7 +433,7 @@ class PlotDialog(pya.QDialog):
     self.format_text = self.format.itemText(index)
 
   def on_plot_button(self):
-    gnuplot_path = r'gnuplot'
+    gnuplot_path = f"{RAW_PATH_TO_KLAYOUT}/gnuplot/bin/gnuplot.exe"
     self.process = pya.QProcess(self)
     env = pya.QProcessEnvironment.systemEnvironment()
     self.process.setProcessEnvironment(env)
