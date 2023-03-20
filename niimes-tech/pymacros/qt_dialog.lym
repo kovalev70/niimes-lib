@@ -431,11 +431,13 @@ class PlotDialog(pya.QDialog):
     self.format_text = self.format.itemText(index)
 
   def on_plot_button(self):
-    print(self.path)
-    print(self.format_text)
-    print(self.from_port_text)
-    print(self.to_port_text)
-    plot = Touchstone(self.path, self.from_port_text, self.to_port_text, self.format_text)
+    gnuplot_path = r'gnuplot'
+    self.process = pya.QProcess(self)
+    env = pya.QProcessEnvironment.systemEnvironment()
+    self.process.setProcessEnvironment(env)
+    self.process.start(gnuplot_path, ["-p"])
+
+    plot = Touchstone(self.path, self.from_port_text, self.to_port_text, self.format_text, self.process)
     plot.create_plot()
 
 def f():

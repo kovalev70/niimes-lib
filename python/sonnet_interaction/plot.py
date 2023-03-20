@@ -7,7 +7,7 @@ import os
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class Touchstone(pya.QDialog):
-    def __init__(self, file: typing.Union[str, typing.TextIO],from_port, to_port, plot_type, encoding: typing.Union[str, None] = None):
+    def __init__(self, file: typing.Union[str, typing.TextIO], from_port, to_port, plot_type, process, encoding: typing.Union[str, None] = None):
         self.snp_file = file
         self.from_port = int(from_port)
         self.to_port = int(to_port)
@@ -25,6 +25,7 @@ class Touchstone(pya.QDialog):
         self.port_names = None
         self.comment_variables = None
         self.has_hfss_port_impedances = False
+        self.process = process
         
         try:
             try:
@@ -269,10 +270,6 @@ class Touchstone(pya.QDialog):
         return npy.imag(z)
            
     def create_plot(self):
-        gnuplot_path = r'C:\Program Files\gnuplot\bin\gnuplot.exe'
-        self.process = pya.QProcess(self)
-        self.process.start(gnuplot_path, ["-p"])
-
         freq, sparameter = self.get_sparameter_arrays()
         txt_file = open(RAW_PATH_TO_KLAYOUT+ f"\EM\gnuplotData.txt", "w+")
         path_to_data = txt_file.name.replace('\\', '/')
