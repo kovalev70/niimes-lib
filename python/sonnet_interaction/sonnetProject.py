@@ -470,10 +470,8 @@ def ports_count():
         for i in layer_indxs:
             layer_info = str(ly.get_info(i)).split()
             layer_son = GeometryBlock.custom_make_translation(str(layer_info[0]), trans_table_layers)  
-            shapes = cell.shapes(i)
-            r = pya.Region(shapes)
             
-            if (len(str(r)) > 0 and (GeometryBlock.layer_filter(layer_son) == True)):
+            if (GeometryBlock.layer_filter(layer_son) == True):
                 si = ly.cell(cell.name).begin_shapes_rec(i)
                         
                 while not si.at_end():
@@ -482,6 +480,5 @@ def ports_count():
                     if (str(text) != 'None'):
                         count += 1
                                 
-                    si.next()
-                            
+                    si.next()                
         return count
