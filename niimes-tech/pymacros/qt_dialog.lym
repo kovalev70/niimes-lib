@@ -23,6 +23,7 @@ import pya
 import os
 import shutil
 import re
+import configparser
 
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
@@ -45,6 +46,7 @@ class EMDialog(pya.QDialog):
     self.init_modeling_settings()
     self.init_cell_size()
     self.init_bottom_buttons()
+    self.load_settings()
     
 # Элементы диалогового окна        
   def init_menu(self):
@@ -228,6 +230,7 @@ class EMDialog(pya.QDialog):
 
     bat_modeling = BatModeling(layout_name, "\EM", self.path_to_sonnet_line.text)
     bat_modeling.create_file()
+    self.save_settings()
     
   def on_open_action(self):
     str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.s**p)")
@@ -242,9 +245,59 @@ class EMDialog(pya.QDialog):
   def on_create_action(self):
     layout_name = pya.CellView().active().name 
     self.create_son(layout_name)
+    self.save_settings()
     
   def on_exit_action(self):
      self.close()
+
+# Методы настроек
+  def save_settings(self):
+    settings = configparser.ConfigParser()
+
+    settings["ABS"] = {
+      "abs_checkbox" : self.abs_checkbox.isChecked(),
+      "abs_from_line" : self.abs_from_line.text,
+      "abs_to_line" : self.abs_to_line.text
+    }
+
+    settings["LIN"] = {
+      "lin_checkbox" : self.lin_checkbox.isChecked(),
+      "lin_from_line" : self.lin_from_line.text,
+      "lin_to_line" : self.lin_to_line.text,
+      "lin_step_line" : self.lin_step_line.text
+    }
+
+    settings["CELL"] = {
+      "xcell_from_line" : self.xcell_from_line.text,
+      "ycell_from_line" : self.ycell_from_line.text
+    }
+
+    with open(f"{RAW_PATH_TO_KLAYOUT}\EM\config.ini", "w") as setting_file:
+      settings.write(setting_file)
+  
+  def load_settings(self):
+    settings = configparser.ConfigParser()
+    settings.read(f"{RAW_PATH_TO_KLAYOUT}\EM\config.ini")
+
+    if "ABS" in settings:
+        abs_settings = settings["ABS"]
+        if abs_settings.getboolean("abs_checkbox"):
+            self.abs_checkbox.setChecked(True)
+            self.abs_from_line.setText(abs_settings.get("abs_from_line", ""))
+            self.abs_to_line.setText(abs_settings.get("abs_to_line", ""))
+
+    if "LIN" in settings:
+        lin_settings = settings["LIN"]
+        if lin_settings.getboolean("lin_checkbox"):
+            self.lin_checkbox.setChecked(True)
+            self.lin_from_line.setText(lin_settings.get("lin_from_line", ""))
+            self.lin_to_line.setText(lin_settings.get("lin_to_line", ""))
+            self.lin_step_line.setText(lin_settings.get("lin_step_line", ""))
+
+    if "CELL" in settings:
+        cell_settings = settings["CELL"]
+        self.xcell_from_line.setText(cell_settings.get("xcell_from_line", ""))
+        self.ycell_from_line.setText(cell_settings.get("ycell_from_line", ""))
 
 # Методы обработки ошибок   
   def check_find_line(self):
