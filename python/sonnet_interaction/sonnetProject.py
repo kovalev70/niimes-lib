@@ -41,14 +41,9 @@ class BatModeling(BatFile):
         self.file_dir_path = RAW_PATH_TO_KLAYOUT + local_path_to_dir + "\\" + file_name
         self.text = [
             "@echo off",
-            "mode con:cols=67 lines=10",
             rf"cd {path_to_sonnet}",
-            "ECHO #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#",
-            "ECHO #             Simulation will start now, please wait..            #",
-            "ECHO #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=#",
-            rf"em {self.file_dir_path}\{file_name}.son",
-            "TIMEOUT /T 20 /NOBREAK",
-            "EXIT"
+            rf"em -v {self.file_dir_path}\{file_name}.son",
+            "@echo on"
         ]
 
 class HeaderBlock:
