@@ -8,12 +8,12 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
     
     self.met1 = pya.LayerInfo(91, 10, "Met1")
     self.met2 = pya.LayerInfo(92, 13, "Met2")
-    self.via2 = pya.LayerInfo(71, 11, "Via1")
+    self.via2 = pya.LayerInfo(71, 11, "Via2")
     self.via3 = pya.LayerInfo(72, 12, "Via3")
     
     self.param("met1", self.TypeLayer, "Layer of met1", default=self.met1, hidden=True)
     self.param("met2", self.TypeLayer, "Layer of met2", default=self.met2, hidden=True)
-    self.param("via2", self.TypeLayer, "Layer of via1", default=self.via2, hidden=True)
+    self.param("via2", self.TypeLayer, "Layer of via2", default=self.via2, hidden=True)
     self.param("via3", self.TypeLayer, "Layer of via3", default=self.via3, hidden=True)
     
     self.param("Rd", self.TypeInt, "Внутреннее расстояние между противоположными сторонами", default=40)

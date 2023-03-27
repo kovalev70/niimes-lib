@@ -86,7 +86,7 @@ class EMDialog(pya.QDialog):
     self.path_to_sonnet_line = pya.QLineEdit(self)
     self.path_to_sonnet_line.setMinimumHeight(25)
     self.path_to_sonnet_line.setMinimumWidth(400)
-    Detective.line_cheker(self.path_to_sonnet_line)
+    Detective.line_checker(self.path_to_sonnet_line)
 
     self.find_sonnet_button = pya.QPushButton("Авто-поиск", self)
     self.find_sonnet_button.setMinimumHeight(27)
