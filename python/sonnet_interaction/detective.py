@@ -1,6 +1,6 @@
 import os
 import string
-from typing import List, Any
+from typing import List
 
 class Detective:
     RAW_PATH_TO_KLAYOUT: str = os.getcwd()
@@ -77,12 +77,12 @@ class Detective:
         return cls._get_path_from_file(path_exists)
 
     @classmethod
-    def line_checker(cls, line_object):
+    def line_checker(cls, line_object) -> None:
         """
         Проверяет наличие пути в файле, и устанавливает его в QLineEdit объект, если он есть.
 
         Аргументы:
-        - line_object: QLineEdit - объект в который нужно установить путь.
+        - line_object (QLineEdit): объект в который нужно установить путь.
         """
         try:
             with open(cls.FILE_PATH, "r") as file:
