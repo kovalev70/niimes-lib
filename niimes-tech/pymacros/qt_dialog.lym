@@ -28,9 +28,17 @@ import configparser
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class EMDialog(pya.QDialog):
+  _instance = None
+
   def __init__(self, parent = None):
     super(EMDialog, self).__init__() 
     self.init_ui()
+
+  @classmethod
+  def instance(cls):
+    if cls._instance is None:
+      cls._instance = cls()
+    return cls._instance
     
   def init_ui(self):  
     self.setWindowTitle("Электромагнитное моделирование")
@@ -497,7 +505,7 @@ class PlotDialog(pya.QDialog):
     plot.create_plot()
 
 def f():
-  dialog = EMDialog(pya.Application.instance().main_window()) 
+  dialog = EMDialog(pya.Application.instance().main_window()).instance()
   dialog.show()
   dialog.exec_()
 
