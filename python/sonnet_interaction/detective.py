@@ -1,53 +1,91 @@
 import os
 import string
+from typing import List
 
 class Detective:
-    RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
-    FILE_PATH = RAW_PATH_TO_KLAYOUT + "\EM\sonnet-path.txt"
+    RAW_PATH_TO_KLAYOUT: str = os.getcwd()
+    FILE_PATH: str = os.path.join(RAW_PATH_TO_KLAYOUT, "EM", "sonnet-path.txt")
 
     @classmethod
-    def __get_disk_list(self):
-        disk_list = []
-        for c in string.ascii_uppercase:
-            disk = c + ':'
+    def _get_disk_list(cls) -> List[str]:
+        """
+        Возвращает список дисков, которые есть на компьютере.
+
+        Возвращает:
+        - Список строк, содержащих имена дисков на компьютере.
+        """
+        disk_list: List[str] = []
+        for letter in string.ascii_uppercase:
+            disk = letter + ':'
             if os.path.isdir(disk):
                 disk_list.append(disk)
         return disk_list
 
     @classmethod
-    def __get_path_to_sonnet(self): 
+    def _get_path_to_sonnet(cls) -> str:
+        """
+        Возвращает путь до директории, в которой содержится файл emstatus.exe.
+
+        Возвращает:
+        - str: Путь до директории, в которой содержится файл emstatus.exe.
+        - Если файл не найден, возвращает пустую строку.
+        """
         filename = 'emstatus.exe'
-        disk_list = self.__get_disk_list()
+        disk_list = cls._get_disk_list()
         for disk in disk_list:
             for root, _, filenames in os.walk(f'{disk}\\'):
-                for file in filenames:
-                    if file == filename:
-                        return root
+                if filename in filenames:
+                    return root
+        return ''
+
 
     @classmethod
-    def __get_path_from_file(self, path_to_file, status):
+    def _get_path_from_file(cls, status: bool) -> str:
+        """
+        Возвращает строку, содержащую путь к файлу, либо записывает путь в файл и возвращает его.
+
+        Аргументы:
+        - status (bool): Если True, метод будет прочитывать файл по указанному пути и возвращать содержимое.
+                         Если False, метод будет записывать путь к файлу в указанный файл и возвращать этот путь.
+
+        Возвращает:
+        - str: путь к файлу.
+        """
         if status:
-            with open(path_to_file, "r") as file:
-                return file.readline()
+            with open(cls.FILE_PATH, "r") as file:
+                return file.readline().strip()
         else:
-            with open(path_to_file, "w+") as file:
-                path = self.__get_path_to_sonnet()
+            path = cls._get_path_to_sonnet()
+            with open(cls.FILE_PATH, "w+") as file:
                 file.write(path)
-                return path
+            return path
 
     @classmethod
-    def file_processing(self):
-        if os.path.exists(self.RAW_PATH_TO_KLAYOUT + "\EM") == False:
-            os.mkdir(self.RAW_PATH_TO_KLAYOUT + "\EM")
+    def file_processing(cls) -> str:
+        """
+        Создает папку "EM" в текущей директории, если ее не существует,
+        затем читает путь из файла FILE_PATH, если он существует, иначе записывает путь в этот файл.
+        
+        Возвращает:
+        - str: путь к файлу
+        """
+        em_folder_path = os.path.join(cls.RAW_PATH_TO_KLAYOUT, "EM")
+        if not os.path.exists(em_folder_path):
+            os.mkdir(em_folder_path)
 
-        return self.__get_path_from_file(self.FILE_PATH, os.path.exists(self.FILE_PATH))
+        path_exists = os.path.exists(cls.FILE_PATH)
+        return cls._get_path_from_file(path_exists)
 
     @classmethod
-    def line_cheker(self, line_object):
+    def line_checker(cls, line_object) -> None:
+        """
+        Проверяет наличие пути в файле, и устанавливает его в QLineEdit объект, если он есть.
+
+        Аргументы:
+        - line_object (QLineEdit): объект в который нужно установить путь.
+        """
         try:
-            with open(self.FILE_PATH, "r") as file:
+            with open(cls.FILE_PATH, "r") as file:
                 line_object.text = file.readline()
         except:
             line_object.placeholderText = r"Введите путь в формате: C:\Program Files\Sonnet Software\17.56\bin"
-
-

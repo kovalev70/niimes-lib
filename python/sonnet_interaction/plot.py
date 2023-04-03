@@ -64,13 +64,19 @@ class Touchstone(pya.QDialog):
 
             fid.close()
     
-    def get_fid(self, file, *args, **kwargs):
+    def get_fid(self, file: typing.Union[str, typing.TextIO], *args, **kwargs) -> typing.TextIO:
+        """Открывает файл и возвращает объект файла."""
         if isinstance(file, str):
             return open(file, *args, **kwargs)
         else:
             return file
 
-    def load_file(self, fid: typing.TextIO):
+    def load_file(self, fid: typing.TextIO) -> None:
+            """Загружает файл с расширением .sNp или .ts и извлекает параметры из него.
+
+            Аргументы:
+            - fid (typing.TextIO): Открытый файловый объект
+            """
             filename = self.filename
             extension = filename.split('.')[-1].lower()
 
@@ -179,13 +185,22 @@ class Touchstone(pya.QDialog):
             if not self.reference:
                 self.reference = [self.resistance] * self.rank
 
-    def get_gamma_z0_from_fid(self, fid):
+    def get_gamma_z0_from_fid(self, fid: typing.TextIO) -> None:
         gamma = []
         z0 = []
+
         def line2ComplexVector(s):
+            """
+            Функция принимает строку s и возвращает вектор комплексных чисел
+            Вначале пробелы заменяются на один пробел, затем строка s разбивается на элементы через пробел
+            Создается список из элементов, которые не являются пустыми строками (если таковые имеются)
+            Оставшиеся элементы списка обрезаются так, чтобы остались только элементы, соответствующие вектору комплексных чисел
+            Создается одномерный массив из этих элементов, и он преобразуется в вектор комплексных чисел с помощью функции scalar2Complex()
+            """
             return self.scalar2Complex(npy.array([k for k in s.strip().split(' ')
                                                 if k != ''][self.rank*-2:],
                                                 dtype='float'))
+            
         fid.seek(0)
         while True:
             line = fid.readline()
@@ -193,6 +208,7 @@ class Touchstone(pya.QDialog):
                 break
             line = line.replace('\t', ' ')
 
+            # если строка содержит Gamma, то добавляем гамму в массив
             if '! Gamma' in line:
                 _line = line.replace('! Gamma', '').replace('!', '').rstrip()
 
@@ -206,7 +222,7 @@ class Touchstone(pya.QDialog):
                         _line += fid.readline().replace('!', '').rstrip()
                     gamma.append(line2ComplexVector(_line))
 
-
+            # если строка содержит Port Impedance, то добавляем z0 в массив
             if '! Port Impedance' in line:
                 _line = line.replace('! Port Impedance', '').rstrip()
                 nb_elem = len(_line.split())
@@ -218,117 +234,150 @@ class Touchstone(pya.QDialog):
                         _line += fid.readline().replace('!', '').rstrip()
                     z0.append(line2ComplexVector(_line))
 
+         # если массив z0 пустой, то задаем значения по умолчанию
         if len(z0) == 0:
             z0 = npy.array(self.resistance, dtype=complex)
 
         self.gamma = npy.array(gamma)
         self.z0 = npy.array(z0)
 
-    def scalar2Complex(s):
+    def scalar2complex(s: typing.List[typing.Union[float, int]]) -> npy.ndarray:
+        """
+        Преобразует список скалярных чисел в массив комплексных чисел.
+
+        Аргументы:
+        - s (List[Union[float, int]]): список, содержащий скалярные числа.
+
+        Возвращает:
+        - npy.ndarray: одномерный массив комплексных чисел, полученный из входного списка.
+        """
         s = npy.array(s)
         z = []
 
-        for k in range(0,len(s),2):
-            z.append(s[k] + 1j*s[k+1])
+        # Проходимся по каждой второй паре элементов списка s и формируем из них комплексные числа
+        for k in range(0, len(s), 2):
+            z.append(s[k] + 1j * s[k + 1])
+
         return npy.array(z).flatten()
-   
-    def get_sparameter_arrays(self):
+
+    def get_sparameter_arrays(self) -> typing.Tuple[npy.ndarray, npy.ndarray]:
+        """Извлекает значения комплексных параметров"""
         v = self.sparameters
 
-        if self.format == 'ri':
-            v_complex = v[:,1::2] + 1j* v[:,2::2]
-        elif self.format == 'ma':
-            v_complex = (v[:,1::2] * numpy.exp(1j*numpy.pi/180 * v[:,2::2]))
-        elif self.format == 'db':
-            v_complex = ((10**(v[:,1::2]/20.0)) * numpy.exp(1j*numpy.pi/180 * v[:,2::2]))
+        # Проверяем формат данных и переводим в комплексную форму
+        if self.format == 'ri':  # Данные представлены как действительная и мнимая части
+            v_complex = v[:,1::2] + 1j * v[:,2::2]
+        elif self.format == 'ma':  # Данные представлены как модуль и фаза
+            v_complex = v[:,1::2] * numpy.exp(1j * numpy.pi/180 * v[:,2::2])
+        elif self.format == 'db':  # Данные представлены в децибелах и фазе
+            v_complex = (10**(v[:,1::2]/20.0)) * numpy.exp(1j * numpy.pi/180 * v[:,2::2])
 
-        if self.rank == 2 :
+        # Возвращаем массив частот и массив комплексных s-параметров
+        if self.rank == 2:
+            # Решейпим комплексные s-параметры из (n, 4) в (n, 2, 2)
+            # Транспонируем массив, чтобы поменять порядок входов и выходов
             return (v[:,0] * self.frequency_mult,
-                    numpy.transpose(v_complex.reshape((-1, self.rank, self.rank)),axes=(0,2,1)))
+                    numpy.transpose(v_complex.reshape((-1, self.rank, self.rank)), axes=(0,2,1)))
         else:
+            # Решейпим комплексные s-параметры из (n, 2) в (n, 1, 2)
             return (v[:,0] * self.frequency_mult,
                     v_complex.reshape((-1, self.rank, self.rank)))
                     
-    def complex_2_magnitude(self, z):
+    def complex_2_magnitude(self, z: complex) -> float:
+        """Преобразует комплексное число z в его модуль (вещественное неотрицательное число)."""
         return npy.abs(z)
-            
-    def magnitude_2_db(self, z):
-        return 20 * npy.log10(z)  
-    
-    def complex_2_db(self, z):
-        return self.magnitude_2_db(npy.abs(z)) 
-        
-    def complex_2_degree(self, z):
+
+    def magnitude_2_db(self, z: float) -> float:
+        """Преобразует амплитуду z в децибелы."""
+        return 20 * npy.log10(z)
+
+    def complex_2_db(self, z: complex) -> float:
+        """Преобразует комплексное число z в децибелы."""
+        return self.magnitude_2_db(npy.abs(z))
+
+    def complex_2_degree(self, z: complex) -> float:
+        """Преобразует комплексное число z в градусы."""
         return npy.angle(z, deg=True)
-    
-    def complex_2_radian(self, z):
+
+    def complex_2_radian(self, z: complex) -> float:
+        """Преобразует комплексное число z в радианы."""
         return npy.angle(z)
         
-    def complex_2_real(self, z):
+    def complex_2_real(self, z: complex) -> float:
+        """Возвращает действительную часть комплексного числа z."""
         return npy.real(z)
-        
-    def complex_2_imag(self, z):
-        return npy.imag(z)
-           
-    def create_plot(self):
-        if os.path.exists(RAW_PATH_TO_KLAYOUT + "\EM") == False:
-            os.mkdir(RAW_PATH_TO_KLAYOUT + "\EM")
 
+    def complex_2_imag(self, z: complex) -> float:
+        """Возвращает мнимую часть комплексного числа z."""
+        return npy.imag(z)
+
+    def create_plot(self) -> None:
+        # Создаем папку, если ее не существует, для хранения EM файлов.
+        em_path = os.path.join(RAW_PATH_TO_KLAYOUT, "EM")
+        if not os.path.exists(em_path):
+            os.mkdir(em_path)
+
+        # Получаем частоту и S-параметры из данных.
         freq, sparameter = self.get_sparameter_arrays()
-        txt_file = open(RAW_PATH_TO_KLAYOUT+ f"\EM\gnuplotData.txt", "w+")
-        path_to_data = txt_file.name.replace('\\', '/')
-        
-        if (self.plot_type == "MAG"):             
+
+        # Создаем текстовый файл и записываем в него значения частоты и значения, соответствующие графику.
+        txt_file = open(os.path.join(em_path, "gnuplotData.txt"), "w+")
+        if self.plot_type in ("MAG", "DB", "ANG", "RAD", "RE", "IM"):
             for i in range(len(sparameter)):
                 txt_file.write(f"{freq[i]/1000000000} ")
-                mag = self.complex_2_magnitude(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{mag}\n")
+                val = self._get_plot_value(sparameter[i][self.from_port - 1][self.to_port - 1], self.plot_type)
+                txt_file.write(f"{val}\n")
             txt_file.close()
-            gnuplot_str = "set ylabel\"Magnitude\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            print(gnuplot_str)
+
+            # Создаем строку gnuplot и записываем ее в процесс для построения графика.
+            ylabel = self._get_plot_ylabel(self.plot_type)
+            gnuplot_str = f"set ylabel\"{ylabel}\"\nset xlabel\"Frequency (GHz)\"\nplot \"{txt_file.name.replace(os.sep, '/')}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
             self.process.write(gnuplot_str.encode())
-            
-        if (self.plot_type == "DB"):             
-            for i in range(len(sparameter)):
-                txt_file.write(f"{freq[i]/1000000000} ")
-                db = self.complex_2_db(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{db}\n")
-            txt_file.close()
-            gnuplot_str = "set ylabel\"Magnitude (dB)\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            self.process.write(gnuplot_str.encode())
-            
-        if (self.plot_type == "ANG"):             
-            for i in range(len(sparameter)):
-                txt_file.write(f"{freq[i]/1000000000} ")
-                ang = self.complex_2_degree(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{ang}\n")
-            txt_file.close()
-            gnuplot_str = "set ylabel\"Phase (Deg)\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            self.process.write(gnuplot_str.encode())
-            
-        if (self.plot_type == "RAD"):             
-            for i in range(len(sparameter)):
-                txt_file.write(f"{freq[i]/1000000000} ")
-                rad = self.complex_2_radian(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{rad}\n")
-            txt_file.close()
-            gnuplot_str = "set ylabel\"Phase (Rad)\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            self.process.write(gnuplot_str.encode())
-            
-        if (self.plot_type == "RE"):             
-            for i in range(len(sparameter)):
-                txt_file.write(f"{freq[i]/1000000000} ")
-                real = self.complex_2_real(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{real}\n")
-            txt_file.close()
-            gnuplot_str = "set ylabel\"Real\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            self.process.write(gnuplot_str.encode())
-            
-        if (self.plot_type == "IM"):             
-            for i in range(len(sparameter)):
-                txt_file.write(f"{freq[i]/1000000000} ")
-                imag = self.complex_2_imag(sparameter[i][self.from_port - 1][self.to_port - 1])          
-                txt_file.write(f"{imag}\n")
-            txt_file.close()
-            gnuplot_str = "set ylabel\"Imag\"\n" + "set xlabel\"Frequency (GHz)\"\n" + f"plot \"{path_to_data}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
-            self.process.write(gnuplot_str.encode())
+
+    def _get_plot_value(self, sparameter_val: complex, plot_type: str) -> float:
+        """
+        Конвертирует значение S-параметра в значение для отображения на графике.
+
+        Аргументы:
+        - sparameter_val (complex): Значение S-параметра, которое необходимо сконвертировать.
+        - plot_type (str): Тип значения для отображения на графике. Может быть одним из значений:
+                           "MAG", "DB", "ANG", "RAD", "RE", "IM".
+
+        Возвращает:
+        - float: Конвертированное значение для отображения на графике.
+        """
+        if plot_type == "MAG":
+            return self.complex_2_magnitude(sparameter_val)
+        elif plot_type == "DB":
+            return self.complex_2_db(sparameter_val)
+        elif plot_type == "ANG":
+            return self.complex_2_degree(sparameter_val)
+        elif plot_type == "RAD":
+            return self.complex_2_radian(sparameter_val)
+        elif plot_type == "RE":
+            return self.complex_2_real(sparameter_val)
+        elif plot_type == "IM":
+            return self.complex_2_imag(sparameter_val)
+
+    def _get_plot_ylabel(self, plot_type: str) -> str:
+        """
+        Возвращает подпись для оси y на графике в зависимости от типа графика.
+
+        Аргументы:
+        - plot_type (str): Тип графика. Может быть одним из значений: "MAG", "DB", "ANG", "RAD", "RE", "IM".
+
+        Возвращает:
+        - str: Подпись для оси y на графике.
+        """
+        if plot_type in ("MAG", "DB"):
+            return "Magnitude" if plot_type == "MAG" else "Magnitude (dB)"
+        elif plot_type == "ANG":
+            return "Phase (Deg)"
+        elif plot_type == "RAD":
+            return "Phase (Rad)"
+        elif plot_type == "RE":
+            return "Real"
+        elif plot_type == "IM":
+            return "Imag"
+
+

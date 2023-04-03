@@ -28,9 +28,17 @@ import configparser
 RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
 
 class EMDialog(pya.QDialog):
+  _instance = None
+
   def __init__(self, parent = None):
     super(EMDialog, self).__init__() 
     self.init_ui()
+
+  @classmethod
+  def instance(cls):
+    if cls._instance is None:
+      cls._instance = cls()
+    return cls._instance
     
   def init_ui(self):  
     self.setWindowTitle("Электромагнитное моделирование")
@@ -86,7 +94,7 @@ class EMDialog(pya.QDialog):
     self.path_to_sonnet_line = pya.QLineEdit(self)
     self.path_to_sonnet_line.setMinimumHeight(25)
     self.path_to_sonnet_line.setMinimumWidth(400)
-    Detective.line_cheker(self.path_to_sonnet_line)
+    Detective.line_checker(self.path_to_sonnet_line)
 
     self.find_sonnet_button = pya.QPushButton("Авто-поиск", self)
     self.find_sonnet_button.setMinimumHeight(27)
@@ -497,7 +505,7 @@ class PlotDialog(pya.QDialog):
     plot.create_plot()
 
 def f():
-  dialog = EMDialog(pya.Application.instance().main_window()) 
+  dialog = EMDialog(pya.Application.instance().main_window()).instance()
   dialog.show()
   dialog.exec_()
 
