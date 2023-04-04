@@ -4,39 +4,51 @@ import re
 import sys
 import pya
 import math
-RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+from typing import List
+
+RAW_PATH_TO_KLAYOUT: str = os.getcwd()
+
 TRANS_TABLE_LAYERS = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
                       '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
 
-
 class Handler:
     @classmethod
-    def insert_list_to_file(self, path_to_file, list):
-        with open(path_to_file, "w+") as file:
-            for str in list:
-                file.write(str)
-                file.write("\n")
-        file.close()
+    def insert_list_to_file(cls, path_to_file: str, lst: List[str]) -> None:
+        """
+        Записывает строки из массива в файл.
 
+        Аргументы:
+        - path_to_file (str): путь до файла.
+        - lst (List[str]): массив строк
+        """
+        with open(path_to_file, "w+") as file:
+            file.write("\n".join(lst))
+    
     @classmethod    
-    def insert_nested_list_to_file(self, path_to_file, nested_list):
+    def insert_nested_list_to_file(cls, path_to_file: str, nested_lst: List[List[str]]) -> None:
+        """
+        Записывает строки из подмассивов в файл.
+
+        Аргументы:
+        - path_to_file (str): путь до файла.
+        - lst (List[str]): массив строк
+        """
         with open(path_to_file, "w+") as file:
-            for block in nested_list:
-                for str in block:
-                    file.write(str)
-                    file.write("\n")
-        
+            for block in nested_lst:
+                file.write("\n".join(block))
+                file.write("\n")
+      
 class BatFile:
-    def __init__(self, file_name, local_path_to_dir):
-        self.file_name = file_name
-        self.file_dir_path = RAW_PATH_TO_KLAYOUT + local_path_to_dir
+    def __init__(self, file_name: str, local_path_to_dir: str):
+        self.file_name: str = file_name
+        self.file_dir_path: str = os.path.join(RAW_PATH_TO_KLAYOUT, local_path_to_dir)
 
-    def create_file(self):
-        Handler.insert_list_to_file(self.file_dir_path + "\\" + self.file_name + ".bat", self.text)
+    def create_file(self) -> None:
+        """Записывает команды в .bat файл и запускаего его"""
+        file_path = os.path.join(self.file_dir_path, f"{self.file_name}.bat")
+        Handler.insert_list_to_file(file_path, self.text)
 
-        os.chdir(self.file_dir_path)
-        os.system(f"start {self.file_name}")
-        os.chdir(RAW_PATH_TO_KLAYOUT)
+        os.startfile(file_path)
         
 class BatModeling(BatFile):
     def __init__(self, file_name, local_path_to_dir, path_to_sonnet):
@@ -46,6 +58,7 @@ class BatModeling(BatFile):
             "@echo off",
             rf"cd {path_to_sonnet}",
             rf"em -v {self.file_dir_path}\{file_name}.son",
+            "pause",
             "@echo on"
         ]
 
@@ -542,7 +555,7 @@ class SonnetProject:
         Handler.insert_nested_list_to_file(cur_dir_path + f"\{self.file_name}.son", self.params)
 
 def ports_count() -> int:
-        """ Функция, которая возращает количество портов на топологии"""
+        """Возращает количество портов на топологии"""
         count = 0
         cv = pya.CellView().active()
         layout = cv.layout()

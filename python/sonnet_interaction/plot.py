@@ -5,7 +5,7 @@ import math
 import pya
 import os
 
-RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+RAW_PATH_TO_KLAYOUT: str = os.getcwd()
 
 class Touchstone(pya.QDialog):
     def __init__(self, file: typing.Union[str, typing.TextIO], from_port, to_port, plot_type, process, encoding: typing.Union[str, None] = None):
@@ -191,7 +191,7 @@ class Touchstone(pya.QDialog):
 
         def line2ComplexVector(s):
             """
-            Функция принимает строку s и возвращает вектор комплексных чисел
+            Принимает строку s и возвращает вектор комплексных чисел
             Вначале пробелы заменяются на один пробел, затем строка s разбивается на элементы через пробел
             Создается список из элементов, которые не являются пустыми строками (если таковые имеются)
             Оставшиеся элементы списка обрезаются так, чтобы остались только элементы, соответствующие вектору комплексных чисел
