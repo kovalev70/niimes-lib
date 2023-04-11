@@ -331,7 +331,7 @@ class Touchstone(pya.QDialog):
 
             # Создаем строку gnuplot и записываем ее в процесс для построения графика.
             ylabel = self._get_plot_ylabel(self.plot_type)
-            gnuplot_str = f"set ylabel\"{ylabel}\"\nset xlabel\"Frequency (GHz)\"\nplot \"{txt_file.name.replace(os.sep, '/')}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
+            gnuplot_str = f"set grid\nset ylabel\"{ylabel}\"\nset xlabel\"Frequency (GHz)\"\nplot \"{txt_file.name.replace(os.sep, '/')}\" u 1:2 with lines title \"S{self.from_port}{self.to_port}\" lt rgb \"red\"\n"
             self.process.write(gnuplot_str.encode())
 
     def _get_plot_value(self, sparameter_val: complex, plot_type: str) -> float:
