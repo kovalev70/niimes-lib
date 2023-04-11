@@ -29,7 +29,7 @@ class Rost_EM_Rectangular(pya.PCellDeclarationHelper):
   def insertBoxes(self, pts_layer, layer):
     
     i = len(pts_layer)
-    while i >= 0:
+    while i > 0:
       self.cell.shapes(layer).insert(pya.Box(pts_layer[i - 2], pts_layer[i - 1]))
       i -= 2
 

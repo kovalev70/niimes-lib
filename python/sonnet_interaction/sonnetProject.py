@@ -107,6 +107,7 @@ class GeometryBlock:
         self.layout = cell_view.layout()
         self.cell = self.layout.top_cell()
         self.layer_indexes = self.layout.layer_indexes()
+        self.polygon_index = 0
         self.x_min = sys.maxsize
         self.y_min = sys.maxsize
         self.x_max = -sys.maxsize
@@ -140,7 +141,7 @@ class GeometryBlock:
             "MET \"TFR1\" 1 RES 50",
             "MET \"Met0via\" 2 VOL INF SOLID 0",
             "MET \"BackVia\" 1 VOL 41000000 10",
-            f"BOX 5 {self.x_box_size} {self.y_box_size} {math.ceil(self.x_box_size / float(xcell)) * 2} {math.ceil(self.y_box_size / float(ycell)) * 2} 20 0",
+            f"BOX 5 {self.x_box_size} {self.y_box_size} {math.floor((self.x_box_size / float(xcell)) * 2)} {math.floor((self.y_box_size / float(ycell)) * 2)} 20 0",
             "      500 1 1 0 0 0 0 \"Air\"",
             "      3 2.65 1 0.0008 0 0 0 \"BCB\"",
             "      3.5 2.65 1 0.0008 0 0 0 \"BCB\"",
@@ -167,7 +168,7 @@ class GeometryBlock:
     
     def ports_on_layer(self, layer_index: int) -> list:
         """
-        Возвращает список объектов типа Text.
+        Возвращает список портов.
 
         Аргументы:
         - layer_index (int): индекс слоя, на котором будет происходить поиск портов.
@@ -187,25 +188,25 @@ class GeometryBlock:
     
     def region_on_layer(self, layer_index: int) -> pya.Region:
         """
-        Возвращает объект типа Region.
+        Возвращает регион на указанном слое layer_index.
 
         Аргументы:
         - layer_index (int): индекс слоя, из которого будет браться Region.
 
         Возвращает:
-        - Region: Итератор, содержащий один или множество Polygon
+        - Region: Итератор, содержащий один или множество Polygon.
         """
         return(pya.Region(self.cell.begin_shapes_rec(layer_index)))
    
     def polygons_in_region(self, region: pya.Region) -> list:
         """
-        Возвращает список объектов типа DPolygon.
+        Возвращает список полигонов в регионе region.
 
         Аргументы:
-        - region (pya.Region): Итератор, содержащий один или множество Polygon
+        - region (pya.Region): Итератор, содержащий один или множество Polygon.
 
         Возвращает:
-        - list: Список DPolygon, преобразованные в базовые единицы данных (dbu)
+        - list: Список DPolygon, преобразованные в базовые единицы данных (dbu).
         """
         dbu_polygons = []
 
@@ -216,13 +217,13 @@ class GeometryBlock:
 
     def points_in_polygon(self, polygon: list) -> list:
         """
-        Возвращает список объектов типа list.
+        Возвращает список точек на полигоне polygon.
 
         Аргументы:
-        - polygon (list): Список, содержащий объекты DPoints
+        - polygon (list): Список, содержащий объекты DPoints.
 
         Возвращает:
-        - list: Список точек в полигоне
+        - list: Список точек в полигоне.
         """
         points_in_polygon = []
         
@@ -236,19 +237,14 @@ class GeometryBlock:
 
     def polygons_count(self) -> int:
         """
-        Возвращает объект типа int.
+        Возвращает количество полигонов, которые будут пересены в sonnet.
 
         Возвращает:
         - int: Количество полигонов на топологии
         """
         polygons_count = 0
-
-        for i in self.layer_indexes:
-            layer_son = self.custom_make_translation(str(str(self.layout.get_info(i)).split()[0]), TRANS_TABLE_LAYERS) 
-
-            if self.layer_filter(layer_son) == True:
-                polygons_count += len(self.polygons_in_region(self.region_on_layer(i)))
-
+        for region in self.sonnet_regions():
+            polygons_count += len(self.polygons_in_region(region))
         return polygons_count
 
     def min_coords_on_polygon(self, points: list):
@@ -378,7 +374,9 @@ class GeometryBlock:
         Возвращает:
         - int: число, которое обозначает материал в Sonnet.
         """
-        if layer == 'Met2u':
+        if layer == 'EM_MET2_Bridge':
+            return 0
+        elif layer == 'Met2u':
             return 1
         elif layer == 'Met1u':
             return 2
@@ -388,7 +386,7 @@ class GeometryBlock:
             return 4
         elif layer == 'TFR3':
             return 3
-        elif layer == 'Via2':
+        elif (layer == 'Via2' or layer == 'Via3'):
             return 7
             
     def ilevel(self, layer) -> int:
@@ -398,7 +396,9 @@ class GeometryBlock:
         Возвращает:
         - int: число, которое обозначает уровень слоя в Sonnet.
         """
-        if layer == 'Met2u':
+        if layer == 'EM_MET2_Bridge':
+            return 1
+        elif (layer == 'Met2u' or layer == 'Via3'):
             return 2
         elif (layer == 'Met1u' or layer == 'TFR1' or layer == 'TFR2' or layer == 'TFR3' or layer == 'Via2'):
             return 3
@@ -416,64 +416,171 @@ class GeometryBlock:
         else: 
             return False
 
-    def list_of_ports(self):
-        """Добавляет в список ports_text информацию о наличии портов на топологии формата .son."""
-        polygon_index = 0
+    def met2_regions(self, met2_layer_index: int) -> list:
+        """
+        Возвращает список регионов слоя met2, а так же регионы, которые образуют мосты.
+
+        Аргументы:
+        - met2_layer_index (int): индекс слоя met2, из которого будут браться Region's.
+
+        Возвращает:
+        - Region: Итератор, содержащий один или множество Polygon.
+        """
+        bridge_regions = []
+        all_met2_region = self.region_on_layer(met2_layer_index)
+        for i in self.layer_indexes:
+            if (str(self.layout.get_info(i)) == "Via3" or "72/12"):
+                via3_region = self.region_on_layer(i)
+            if (str(self.layout.get_info(i)) == "Met1" or "91/10"):
+                met1_region = self.region_on_layer(i)
+
+        met2_under_via3= all_met2_region.and_(all_met2_region and via3_region)
+        met2_region = all_met2_region.not_overlapping(met1_region)
+        em_met2_bridge = (all_met2_region.not_(all_met2_region and via3_region)).not_(met2_region)
+        bridge_regions.append(met2_under_via3)
+        bridge_regions.append(met2_region)
+        bridge_regions.append(em_met2_bridge)
+        viabridge_region = met2_under_via3.and_((all_met2_region.not_(all_met2_region and via3_region)).not_(met2_region).size(math.ceil(3 / self.layout.dbu)))
+        bridge_regions.append(viabridge_region)
+        bridge_regions.append(viabridge_region)
+        return(bridge_regions)
+    
+    def sonnet_regions(self) -> list:
+        sonnet_regions = []
         for i in self.layer_indexes:
             layer_son = self.custom_make_translation((str(self.layout.get_info(i)).split()[0]), TRANS_TABLE_LAYERS)
+            if (layer_son == "Met2u"):
+                sonnet_regions += self.met2_regions(i)
+            elif (self.layer_filter(layer_son) == True):
+                sonnet_regions.append(self.region_on_layer(i))
+        return sonnet_regions
+    
+    def met2_bridge(self, met2_regions: list):
+        """
+        Добавляет в список geometry_text описание полигонов слоя met2 и полигонов, образующих мост.
 
-            if (self.layer_filter(layer_son) == True):
+        Аргументы:
+        - met2_regions (list): список объектов типа Region.
+        """
+        for polygon in self.polygons_in_region(met2_regions[0]):
+            self.polygon_index += 1
+            points = self.points_in_polygon(polygon)
+            self.geometry_text.append(f"{self.ilevel('Met2u')} {len(points) + 1} {self.mtype('Met2u')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+            self.geometry_text.append(f"TLAYNAM Met2u INH")
+            for point in self.sonnet_points(points):
+                        self.geometry_text.append(f"{point[0]} {point[1]}") 
+            self.geometry_text.append("END")
+
+        for polygon in self.polygons_in_region(met2_regions[1]):
+            self.polygon_index += 1
+            points = self.points_in_polygon(polygon)
+            self.geometry_text.append(f"{self.ilevel('Met2u')} {len(points) + 1} {self.mtype('Met2u')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+            self.geometry_text.append(f"TLAYNAM Met2u INH")
+            for point in self.sonnet_points(points):
+                        self.geometry_text.append(f"{point[0]} {point[1]}") 
+            self.geometry_text.append("END")
+
+        for polygon in self.polygons_in_region(met2_regions[2]):
+            self.polygon_index += 1
+            points = self.points_in_polygon(polygon)
+            self.geometry_text.append(f"{self.ilevel('EM_MET2_Bridge')} {len(points) + 1} {self.mtype('EM_MET2_Bridge')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+            self.geometry_text.append(f"TLAYNAM Met2u INH") 
+            for point in self.sonnet_points(points):
+                        self.geometry_text.append(f"{point[0]} {point[1]}") 
+            self.geometry_text.append("END")
+
+        for polygon in self.polygons_in_region(met2_regions[3]):
+            self.polygon_index += 1
+            points = self.points_in_polygon(polygon)
+            self.geometry_text.append(f"{self.ilevel('EM_MET2_Bridge')} {len(points) + 1} {self.mtype('EM_MET2_Bridge')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+            self.geometry_text.append(f"TLAYNAM Met2u INH") 
+            for point in self.sonnet_points(points):
+                        self.geometry_text.append(f"{point[0]} {point[1]}") 
+            self.geometry_text.append("END")
+
+            self.polygon_index += 1
+            self.geometry_text.append(f"VIA POLYGON")
+            self.geometry_text.append(f"{self.ilevel('Via3')} {len(points) + 1} {self.mtype('Via2')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+            self.geometry_text.append(f"TOLEVEL 1 CENTER NOCOVERS")
+            self.geometry_text.append(f"TLAYNAM Via3 NOH") 
+            for point in self.sonnet_points(points):
+                        self.geometry_text.append(f"{point[0]} {point[1]}") 
+            self.geometry_text.append("END")
+
+    def writing_ports(self, polygons: list, layer_index: int):
+        """
+        Проверяет порты на принадлежность к полигону и добавляет в список ports_text описание портов. 
+
+        Аргументы:
+        - polygons (list): список объектов типа DPolygon.
+        - layer_index (int): номер слоя.
+        """
+        for polygon in polygons:
+            self.polygon_index += 1
+            for text in self.ports_on_layer(layer_index):
+                port_x = text.x * self.layout.dbu
+                port_y = text.y * self.layout.dbu
+                is_port_vertical = ((port_y == polygon.bbox().bottom or port_y == polygon.bbox().top) and (port_x >= polygon.bbox().left and port_x <= polygon.bbox().right))
+                is_port_lateral = ((port_x == polygon.bbox().left or port_x == polygon.bbox().right) and (port_y >= polygon.bbox().bottom and port_y <= polygon.bbox().top))
+
+                if (is_port_vertical or is_port_lateral):  
+                    self.ports_text.append("POR1 BOX") 
+                    self.ports_text.append(f"POLY {self.polygon_index} 1")
+                    
+                    if (is_port_vertical and port_y == polygon.bbox().top):
+                        self.port_top = True
+                        self.ports_text.append("1")
+                        
+                    elif (is_port_vertical and port_y == polygon.bbox().bottom):
+                        self.port_bottom = True
+                        self.ports_text.append("3")
+                    
+                    if (is_port_lateral and port_x == polygon.bbox().left):
+                        self.port_left = True
+                        self.ports_text.append("0")
+                        
+                    elif (is_port_lateral and port_x == polygon.bbox().right):
+                        self.port_right = True
+                        self.ports_text.append("2")
+
+                    self.ports_text.append(f"{text.string} 50 0 0 0 0 0")
+
+    def list_of_ports(self):
+        """Добавляет в список ports_text информацию о наличии портов на топологии формата .son."""
+        self.polygon_index = 0
+        for i in self.layer_indexes:
+            layer_son = self.custom_make_translation((str(self.layout.get_info(i)).split()[0]), TRANS_TABLE_LAYERS)
+            if (layer_son == "Met2u"):
+                for region in self.met2_regions(i):
+                    polygons = self.polygons_in_region(region)
+                    self.writing_ports(polygons, i)
+
+            elif (self.layer_filter(layer_son) == True):
                 polygons = self.polygons_in_region(self.region_on_layer(i))
-                for polygon in polygons:
-                    polygon_index += 1
-                    for text in self.ports_on_layer(i):
-                        port_x = text.x * self.layout.dbu
-                        port_y = text.y * self.layout.dbu
-                        is_port_vertical = ((port_y == polygon.bbox().bottom or port_y == polygon.bbox().top) and (port_x >= polygon.bbox().left and port_x <= polygon.bbox().right))
-                        is_port_lateral = ((port_x == polygon.bbox().left or port_x == polygon.bbox().right) and (port_y >= polygon.bbox().bottom and port_y <= polygon.bbox().top))
-
-                        if (is_port_vertical or is_port_lateral):  
-                            self.ports_text.append("POR1 BOX") 
-                            self.ports_text.append(f"POLY {polygon_index} 1")
-                            
-                            if (is_port_vertical and port_y == polygon.bbox().top):
-                                self.port_top = True
-                                self.ports_text.append("1")
-                                
-                            elif (is_port_vertical and port_y == polygon.bbox().bottom):
-                                self.port_bottom = True
-                                self.ports_text.append("3")
-                            
-                            if (is_port_lateral and port_x == polygon.bbox().left):
-                                self.port_left = True
-                                self.ports_text.append("0")
-                                
-                            elif (is_port_lateral and port_x == polygon.bbox().right):
-                                self.port_right = True
-                                self.ports_text.append("2")
-
-                            self.ports_text.append(f"{text.string} 50 0 0 0 0 0")
+                self.writing_ports(polygons, i)
 
     def list_of_geometry(self):
         """Добавляет в список geometry_text информацию о полигонах на топологии формата .son."""
         self.geometry_text.append(f"NUM {self.polygons_count()}")
-        polygon_index = 0
+        self.polygon_index = 0
         for i in self.layer_indexes:
             layer_son = self.custom_make_translation((str(self.layout.get_info(i)).split()[0]), TRANS_TABLE_LAYERS)
+            if (layer_son == "Met2u"):
+               self.met2_bridge(self.met2_regions(i))
 
-            if (self.layer_filter(layer_son) == True):
+            elif (self.layer_filter(layer_son) == True):
                 polygons = self.polygons_in_region(self.region_on_layer(i))
                 for polygon in polygons:
-                    polygon_index += 1 
+                    self.polygon_index += 1 
                     points = self.points_in_polygon(polygon)
 
                     if (layer_son == 'Via2'):
                         self.geometry_text.append(f"VIA POLYGON")
-                        self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {polygon_index} 1 1 100 100 0 0 0 Y")
-                        self.geometry_text.append(f"TOLEVEL 2 SOLID NOCOVERS")
+                        self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
+                        self.geometry_text.append(f"TOLEVEL 2 CENTER NOCOVERS")
                         self.geometry_text.append(f"TLAYNAM {layer_son} NOH") 
                     else:
-                        self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {polygon_index} 1 1 100 100 0 0 0 Y")
+                        self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
                         self.geometry_text.append(f"TLAYNAM {layer_son} INH") 
 
                     for point in self.sonnet_points(points):
