@@ -42,7 +42,7 @@ class EMDialog(pya.QDialog):
     
   def init_ui(self):  
     self.setWindowTitle("Электромагнитное моделирование")
-    self.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\logo-01.png"))
+    self.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\logo-01.png"))
     self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
     self.setFixedSize(600, 300)
     
@@ -512,7 +512,7 @@ def f():
 # Добавление нового пунтка меню в KLayout
 a = pya.Action()
 a.title = "Электромагнитное моделирование"
-a.icon = r"salt\Niimes-lib\Niimes-tech\images\logo-01.png"
+a.icon = r"salt\SVR_pHEMT025D\images\logo-01.png"
 a.icon_text = "EM-menu"
 a.on_triggered(f)
   

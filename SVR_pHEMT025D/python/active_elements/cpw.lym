@@ -22,7 +22,7 @@ class CPW(pya.Library):
     
     self.layout().register_pcell("VT", VT())
 
-    self.register("SVR_025D - CPW")
+    self.register("SVR_pHEMT025D - CPW")
 CPW()
 </text>
 </klayout-macro>

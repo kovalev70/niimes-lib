@@ -24,7 +24,7 @@ class Substrates(pya.Library):
     
     self.layout().register_pcell("Border", Border())
 
-    self.register("SVR_025D - Substrates")
+    self.register("SVR_pHEMT025D - Substrates")
 Substrates()
 </text>
 </klayout-macro>

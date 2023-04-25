@@ -29,7 +29,7 @@ class Resistors(pya.Library):
     self.layout().register_pcell("TFR3", TFR3())
     self.layout().register_pcell("MSR", MSR())
 
-    self.register("SVR_025D - Resistors")
+    self.register("SVR_pHEMT025D - Resistors")
 Resistors()
 </text>
 </klayout-macro>

@@ -32,7 +32,7 @@ class Lines(pya.Library):
     self.layout().register_pcell("MCROSSX", MCROSSX())
     self.layout().register_pcell("MTEEX", MTEEX())
 
-    self.register("SVR_025D - Lines")
+    self.register("SVR_pHEMT025D - Lines")
 Lines()
 </text>
 </klayout-macro>

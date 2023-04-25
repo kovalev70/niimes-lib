@@ -29,7 +29,7 @@ class Capacitors(pya.Library):
     self.layout().register_pcell("MIMCAP3", MIMCAP3())
     self.layout().register_pcell("MIMIMCAP", MIMIMCAP())
 
-    self.register("SVR_025D - Capacitors")
+    self.register("SVR_pHEMT025D - Capacitors")
 Capacitors()
 </text>
 </klayout-macro>

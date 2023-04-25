@@ -21,19 +21,19 @@ AppUpdatesURL={#MyAppURL}
 DefaultDirName={userappdata}\{#MyAppName}
 DisableDirPage=yes
 DisableProgramGroupPage=yes
-LicenseFile=C:\Users\kovalevvv\Desktop\KLayout\LICENSE.txt
-InfoBeforeFile=C:\Users\kovalevvv\Desktop\KLayout\Before.txt
-InfoAfterFile=C:\Users\kovalevvv\Desktop\KLayout\After.txt
+LicenseFile=InstallerData\LICENSE.txt
+InfoBeforeFile=InstallerData\Before.txt
+InfoAfterFile=InstallerData\After.txt
 ; Remove the following line to run in administrative install mode (install for all users.)
 PrivilegesRequired=lowest
-OutputDir=C:\Users\kovalevvv\Desktop
+OutputDir=\Output
 OutputBaseFilename=setup
-SetupIconFile=C:\Users\kovalevvv\Desktop\KLayout\logo.ico
+SetupIconFile=InstallerData\logo.ico
 Password=niimes
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
-WizardImageFile=C:\Users\kovalevvv\Desktop\KLayout\final.bmp
+WizardImageFile=InstallerData\final.bmp
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

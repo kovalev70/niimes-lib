@@ -23,7 +23,7 @@ class Inductors(pya.Library):
     
     self.layout().register_pcell("Rost_EM_Rectangular", Rost_EM_Rectangular())
 
-    self.register("SVR_025D - Inductors")
+    self.register("SVR_pHEMT025D - Inductors")
     
 Inductors()
 </text>
