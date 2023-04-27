@@ -131,6 +131,44 @@ class GeometryBlock:
         self.list_of_ports()
         self.border_size()
         self.list_of_geometry()
+        self.stack_layers = [
+            "TECHLAY METAL Met1u <UNSPECIFIED> 0 0 ",
+            "3 0 2 N 1 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL Met2u <UNSPECIFIED> 0 0 ",
+            "2 0 1 N 2 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL TFR1 <UNSPECIFIED> 0 0 ",
+            "3 0 5 N 3 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL TFR2 <UNSPECIFIED> 0 0 ",
+            "3 0 4 N 4 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL TFR3 <UNSPECIFIED> 0 0 ",
+            "3 0 3 N 5 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL EM_MET2_Bridge <UNSPECIFIED> 0 0 ",
+            "1 0 0 N 6 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY VIA Via2 <UNSPECIFIED> 0 0 ",
+            "VIA POLYGON",
+            "3 0 7 N 7 1 1 100 100 0 0 0 Y",
+            "TOLEVEL 2 CENTER NOCOVERS", 
+            "END",
+            "END",
+            "TECHLAY VIA Via3 <UNSPECIFIED> 0 0 ",
+            "VIA POLYGON",
+            "2 0 7 N 8 1 1 100 100 0 0 0 Y",
+            "TOLEVEL 1 CENTER NOCOVERS",
+            "END",
+            "END"
+        ]
         self.text= [
             "GEO",
             "MET \"EM_MET2_Bridge\" 6 TMM 41000000 0.5 5 2",
@@ -149,7 +187,7 @@ class GeometryBlock:
             "      0.22 7.5 1 0.001 0 0 0 \"SINx\"",
             "      85 12.9 1 0.001 0 0 0 \"GaAs\""
         ]
-        self.text += self.ports_text + self.geometry_text 
+        self.text += self.stack_layers + self.ports_text + self.geometry_text 
         
     @classmethod        
     def custom_make_translation(self, text, translation) -> str:
@@ -484,7 +522,7 @@ class GeometryBlock:
             self.polygon_index += 1
             points = self.points_in_polygon(polygon)
             self.geometry_text.append(f"{self.ilevel('EM_MET2_Bridge')} {len(points) + 1} {self.mtype('EM_MET2_Bridge')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
-            self.geometry_text.append(f"TLAYNAM Met2u INH") 
+            self.geometry_text.append(f"TLAYNAM EM_MET2_Bridge INH") 
             for point in self.sonnet_points(points):
                         self.geometry_text.append(f"{point[0]} {point[1]}") 
             self.geometry_text.append("END")
@@ -493,7 +531,7 @@ class GeometryBlock:
             self.polygon_index += 1
             points = self.points_in_polygon(polygon)
             self.geometry_text.append(f"{self.ilevel('EM_MET2_Bridge')} {len(points) + 1} {self.mtype('EM_MET2_Bridge')} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
-            self.geometry_text.append(f"TLAYNAM Met2u INH") 
+            self.geometry_text.append(f"TLAYNAM EM_MET2_Bridge INH") 
             for point in self.sonnet_points(points):
                         self.geometry_text.append(f"{point[0]} {point[1]}") 
             self.geometry_text.append("END")

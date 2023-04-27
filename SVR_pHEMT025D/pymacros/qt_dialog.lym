@@ -63,17 +63,17 @@ class EMDialog(pya.QDialog):
     
     self.open_action = pya.QAction("Построение графиков", self)
     self.open_action.setShortcut(pya.QKeySequence("Ctrl+O"))
-    self.open_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\plot.png"))
+    self.open_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\plot.png"))
     self.open_action.triggered(self.on_open_action)
     
     self.create_action = pya.QAction("Экспорт в Sonnet", self)
     self.create_action.setShortcut(pya.QKeySequence("Ctrl+P"))
-    self.create_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\data-transfer.png"))
+    self.create_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\data-transfer.png"))
     self.create_action.triggered(self.on_create_action)
     
     self.exit_action = pya.QAction("Выход", self)
     self.exit_action.setShortcut(pya.QKeySequence("Alt+F4"))
-    self.exit_action.setIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\exit.png"))
+    self.exit_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\exit.png"))
     self.exit_action.triggered(self.on_exit_action)
     
     self.file_menu.addAction(self.open_action)
@@ -313,7 +313,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка Sonnet")
       error_msg.setText("Необходимо ввести путь до Sonnet!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
 
@@ -322,7 +322,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка настроек")
       error_msg.setText("Необходимо проверить корректность данных ABS!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
 
@@ -331,7 +331,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка настроек")
       error_msg.setText("Необходимо проверить корректность данных LIN!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
 
@@ -340,7 +340,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка настроек")
       error_msg.setText("Необходимо выбрать хотя бы один тип развертки!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
 
@@ -349,7 +349,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка макета")
       error_msg.setText("Необходимо создать \"Layout\"!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
       
@@ -358,7 +358,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Ошибка настроек")
       error_msg.setText("Необходимо проверить корректность данных размеров ячеек!")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.exec_()
       return False
     
@@ -372,7 +372,7 @@ class EMDialog(pya.QDialog):
       error_msg = pya.QMessageBox()
       error_msg.setWindowTitle("Предупреждение")
       error_msg.setText("Директория с данным именем уже существует, перезаписать её?")
-      error_msg.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\warning.png"))
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
       error_msg.setStandardButtons(pya.QMessageBox.Ok | pya.QMessageBox.Cancel)
       return_value = error_msg.exec_()
 
@@ -419,7 +419,7 @@ class PlotDialog(pya.QDialog):
 
   def init_ui(self):
     self.setWindowTitle("Построение графиков")
-    self.setWindowIcon(pya.QIcon(r"salt\Niimes-lib\Niimes-tech\images\plot.png"))
+    self.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\plot.png"))
     self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
     self.setFixedSize(200, 140)
     
