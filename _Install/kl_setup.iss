@@ -65,6 +65,18 @@ begin
       SysErrorMessage(ResultCode), mbError, MB_OK);
 end;
 
+function InitializeSetup: Boolean;
+begin
+//Check the registry
+  
+  if RegKeyExists(HKEY_CURRENT_USER, 'HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\KLayout\') then
+  MsgBox('please install ABC first!!', mbError, MB_OK);
+  (*** Remove the following block! Used by this demo to simulate a prerequisite install requiring a reboot. ***)
+  //if not Restarted then
+    //RestartReplace(ParamStr(0), '');
+  Result := False;
+end;
+
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon

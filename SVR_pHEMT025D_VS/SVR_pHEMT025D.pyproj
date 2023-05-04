@@ -32,13 +32,13 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\niimes-tech\python\sonnet_interaction\detective.py">
+    <Compile Include="..\SVR_pHEMT025D\python\sonnet_interaction\detective.py">
       <Link>Sonnet\detective.py</Link>
     </Compile>
-    <Compile Include="..\niimes-tech\python\sonnet_interaction\plot.py">
+    <Compile Include="..\SVR_pHEMT025D\python\sonnet_interaction\plot.py">
       <Link>Sonnet\plot.py</Link>
     </Compile>
-    <Compile Include="..\niimes-tech\python\sonnet_interaction\sonnetProject.py">
+    <Compile Include="..\SVR_pHEMT025D\python\sonnet_interaction\sonnetProject.py">
       <Link>Sonnet\sonnetProject.py</Link>
     </Compile>
     <Compile Include="SVR_pHEMT025D.py" />
