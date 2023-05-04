@@ -117,7 +117,7 @@
   <xfill>false</xfill>
   <animation>0</animation>
   <name/>
-  <source>'Via1 ' 70/6@1</source>
+  <source>Via1 70/6@1</source>
  </properties>
  <properties>
   <frame-color>#9b7300</frame-color>

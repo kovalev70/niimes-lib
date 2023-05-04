@@ -9,7 +9,8 @@ from typing import List
 RAW_PATH_TO_KLAYOUT: str = os.getcwd()
 
 TRANS_TABLE_LAYERS = {'Met1': 'Met1u', 'Met2':'Met2u', '80/7': 'TFR1', '81/8': 'TFR2',
-                      '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u'}
+                      '82/9': 'TFR3', '91/10': 'Met1u', '71/11': 'Via2', '92/13': 'Met2u',
+                      '90/5': 'Met0', '70/6': 'Via1'}
 
 class Handler:
     @classmethod
@@ -141,30 +142,40 @@ class GeometryBlock:
             "END",
             "END",
             "TECHLAY METAL TFR1 <UNSPECIFIED> 0 0 ",
-            "3 0 5 N 3 1 1 100 100 0 0 0 Y",
+            "3 0 6 N 3 1 1 100 100 0 0 0 Y",
             "END",
             "END",
             "TECHLAY METAL TFR2 <UNSPECIFIED> 0 0 ",
-            "3 0 4 N 4 1 1 100 100 0 0 0 Y",
+            "3 0 5 N 4 1 1 100 100 0 0 0 Y",
             "END",
             "END",
             "TECHLAY METAL TFR3 <UNSPECIFIED> 0 0 ",
-            "3 0 3 N 5 1 1 100 100 0 0 0 Y",
+            "3 0 4 N 5 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY METAL Met0 <UNSPECIFIED> 0 0 ",
+            "4 0 3 N 6 1 1 100 100 0 0 0 Y",
             "END",
             "END",
             "TECHLAY METAL EM_MET2_Bridge <UNSPECIFIED> 0 0 ",
-            "1 0 0 N 6 1 1 100 100 0 0 0 Y",
+            "1 0 0 N 7 1 1 100 100 0 0 0 Y",
+            "END",
+            "END",
+            "TECHLAY VIA Via1 <UNSPECIFIED> 0 0 ",
+            "VIA POLYGON",
+            "4 0 7 N 8 1 1 100 100 0 0 0 Y",
+            "TOLEVEL 3 CENTER NOCOVERS", 
             "END",
             "END",
             "TECHLAY VIA Via2 <UNSPECIFIED> 0 0 ",
             "VIA POLYGON",
-            "3 0 7 N 7 1 1 100 100 0 0 0 Y",
+            "3 0 8 N 9 1 1 100 100 0 0 0 Y",
             "TOLEVEL 2 CENTER NOCOVERS", 
             "END",
             "END",
             "TECHLAY VIA Via3 <UNSPECIFIED> 0 0 ",
             "VIA POLYGON",
-            "2 0 7 N 8 1 1 100 100 0 0 0 Y",
+            "2 0 8 N 10 1 1 100 100 0 0 0 Y",
             "TOLEVEL 1 CENTER NOCOVERS",
             "END",
             "END"
@@ -174,6 +185,7 @@ class GeometryBlock:
             "MET \"EM_MET2_Bridge\" 6 TMM 41000000 0.5 5 2",
             "MET \"Met2u\" 4 TMM 41000000 0.5 5.9 2",
             "MET \"Met1u\" 5 TMM 41000000 0.5 0.9 2",
+            "MET \"Met0\" 7 TMM 41000000 0.5 0.9 2",
             "MET \"TFR3\" 3 RES 3000",
             "MET \"TFR2\" 2 RES 600",
             "MET \"TFR1\" 1 RES 50",
@@ -419,12 +431,16 @@ class GeometryBlock:
         elif layer == 'Met1u':
             return 2
         elif layer == 'TFR1':
-            return 5
+            return 6
         elif layer == 'TFR2':
-            return 4
+            return 5
         elif layer == 'TFR3':
-            return 3
+            return 4
         elif (layer == 'Via2' or layer == 'Via3'):
+            return 8
+        elif (layer == 'Met0'):
+            return 3
+        elif (layer == 'Via1'):
             return 7
             
     def ilevel(self, layer) -> int:
@@ -440,6 +456,8 @@ class GeometryBlock:
             return 2
         elif (layer == 'Met1u' or layer == 'TFR1' or layer == 'TFR2' or layer == 'TFR3' or layer == 'Via2'):
             return 3
+        elif (layer == 'Met0' or layer == 'Via1'):
+            return 4
             
     @classmethod        
     def layer_filter(self, layer) -> bool:
@@ -449,7 +467,8 @@ class GeometryBlock:
         Возвращает:
         - bool: флаг, который указывает на необходимость переноса слоя в Sonnet.
         """
-        if (layer == 'Met2u' or layer == 'Met1u' or layer == 'TFR1' or layer == 'TFR2' or layer == 'TFR3' or layer == 'Via2'):
+        if (layer == 'Met2u' or layer == 'Met1u' or layer == 'TFR1' or layer == 'TFR2' 
+            or layer == 'TFR3' or layer == 'Via2' or layer == 'Met0' or layer == 'Via1'):
             return True  
         else: 
             return False
@@ -612,11 +631,14 @@ class GeometryBlock:
                     self.polygon_index += 1 
                     points = self.points_in_polygon(polygon)
 
-                    if (layer_son == 'Via2'):
+                    if (layer_son == 'Via2' or layer_son == 'Via1'):
                         self.geometry_text.append(f"VIA POLYGON")
                         self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
-                        self.geometry_text.append(f"TOLEVEL 2 CENTER NOCOVERS")
-                        self.geometry_text.append(f"TLAYNAM {layer_son} NOH") 
+                        if (layer_son == 'Via2'):
+                            self.geometry_text.append(f"TOLEVEL 2 CENTER NOCOVERS")
+                        else:
+                            self.geometry_text.append(f"TOLEVEL 3 CENTER NOCOVERS")
+                        self.geometry_text.append(f"TLAYNAM {layer_son} NOH")
                     else:
                         self.geometry_text.append(f"{self.ilevel(layer_son)} {len(points) + 1} {self.mtype(layer_son)} V {self.polygon_index} 1 1 100 100 0 0 0 Y")
                         self.geometry_text.append(f"TLAYNAM {layer_son} INH") 
