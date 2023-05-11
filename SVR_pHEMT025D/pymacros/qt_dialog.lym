@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="utf-8"?>
+<klayout-macro>
+ <description/>
+ <version/>
+ <category>pymacros</category>
+ <prolog/>
+ <epilog/>
+ <doc/>
+ <autorun>true</autorun>
+ <autorun-early>false</autorun-early>
+ <priority>0</priority>
+ <shortcut/>
+ <show-in-menu>false</show-in-menu>
+ <group-name/>
+ <menu-path/>
+ <interpreter>python</interpreter>
+ <dsl-interpreter-name/>
+ <text>from sonnet_interaction.sonnetProject import *
+from sonnet_interaction.detective import *
+from sonnet_interaction.plot import *
+
+import pya
+import os
+import shutil
+import re
+import configparser
+
+RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+
+class EMDialog(pya.QDialog):
+  _instance = None
+
+  def __init__(self, parent = None):
+    super(EMDialog, self).__init__() 
+    self.init_ui()
+
+  @classmethod
+  def instance(cls):
+    if cls._instance is None:
+      cls._instance = cls()
+    return cls._instance
+    
+  def init_ui(self):  
+    self.setWindowTitle("Электромагнитное моделирование")
+    self.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\logo-01.png"))
+    self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
+    self.setFixedSize(600, 300)
+    
+    self.layout_main = pya.QVBoxLayout(self)
+    self.layout_main.setContentsMargins(10, 10, 10, 10)
+    
+    self.init_menu()
+    self.init_find()
+    self.init_modeling_settings()
+    self.init_cell_size()
+    self.init_bottom_buttons()
+    self.load_settings()
+    
+# Элементы диалогового окна        
+  def init_menu(self):
+    self.menu_bar = pya.QMenuBar()
+    self.file_menu = pya.QMenu("Проект", self)
+    
+    self.open_action = pya.QAction("Построение графиков", self)
+    self.open_action.setShortcut(pya.QKeySequence("Ctrl+O"))
+    self.open_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\plot.png"))
+    self.open_action.triggered(self.on_open_action)
+    
+    self.create_action = pya.QAction("Экспорт в Sonnet", self)
+    self.create_action.setShortcut(pya.QKeySequence("Ctrl+P"))
+    self.create_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\data-transfer.png"))
+    self.create_action.triggered(self.on_create_action)
+    
+    self.exit_action = pya.QAction("Выход", self)
+    self.exit_action.setShortcut(pya.QKeySequence("Alt+F4"))
+    self.exit_action.setIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\exit.png"))
+    self.exit_action.triggered(self.on_exit_action)
+    
+    self.file_menu.addAction(self.open_action)
+    self.file_menu.addAction(self.create_action)
+    self.file_menu.addSeparator()
+    self.file_menu.addAction(self.exit_action)
+    
+    self.menu_bar.addMenu(self.file_menu)
+    self.layout_main.setMenuBar(self.menu_bar)
+    
+  def init_find(self):
+    layout_label = pya.QHBoxLayout(self)
+    layout_find_sonnet = pya.QHBoxLayout(self)
+
+    self.label = pya.QLabel("Путь до Sonnet:", self)
+    self.label.setMaximumHeight(13)
+    
+    self.path_to_sonnet_line = pya.QLineEdit(self)
+    self.path_to_sonnet_line.setMinimumHeight(25)
+    self.path_to_sonnet_line.setMinimumWidth(400)
+    Detective.line_checker(self.path_to_sonnet_line)
+
+    self.find_sonnet_button = pya.QPushButton("Авто-поиск", self)
+    self.find_sonnet_button.setMinimumHeight(27)
+    self.find_sonnet_button.setMinimumWidth(150)
+    self.find_sonnet_button.clicked(self.on_find_sonnet_button)
+
+    layout_label.addWidget(self.label) 
+
+    layout_find_sonnet.addWidget(self.path_to_sonnet_line)
+    layout_find_sonnet.addWidget(self.find_sonnet_button)
+    
+    self.layout_main.addLayout(layout_label)
+    self.layout_main.addLayout(layout_find_sonnet)
+    
+  def init_modeling_settings(self):
+    layout_modeling_settings = pya.QVBoxLayout(self)
+
+    layout_abs_settings = pya.QHBoxLayout(self)
+    layout_lin_settings = pya.QHBoxLayout(self)
+
+    self.settings_window = pya.QGroupBox("Настройки моделирования", self)
+    
+    
+    double_validator = pya.QDoubleValidator(self)
+    double_validator.setNotation(pya.QDoubleValidator.StandardNotation)
+    double_validator.setBottom(1)
+    double_validator.setDecimals(2)
+    
+    self.abs_checkbox = pya.QCheckBox("ABS")
+    self.abs_from_line = pya.QLineEdit(self)
+    self.abs_from_line.setValidator(double_validator)
+    self.abs_from_line.setMaximumWidth(50)
+    self.abs_label_to = pya.QLabel("до", self)
+    self.abs_to_line = pya.QLineEdit(self)
+    self.abs_to_line.setValidator(double_validator)
+    self.abs_to_line.setMaximumWidth(50)
+    self.abs_label_unit = pya.QLabel("GHZ", self)
+
+    self.lin_checkbox = pya.QCheckBox("LIN ")
+    self.lin_from_line = pya.QLineEdit(self)
+    self.lin_from_line.setValidator(double_validator)
+    self.lin_from_line.setMaximumWidth(50)
+    self.lin_label_to = pya.QLabel("до", self)
+    self.lin_to_line = pya.QLineEdit(self)
+    self.lin_to_line.setValidator(double_validator)
+    self.lin_to_line.setMaximumWidth(50)
+    self.lin_label_step = pya.QLabel("с шагом", self)
+    self.lin_step_line = pya.QLineEdit(self)
+    self.lin_step_line.setValidator(double_validator)
+    self.lin_step_line.setMaximumWidth(50)
+    self.lin_label_unit = pya.QLabel("GHZ", self)
+    
+
+    layout_abs_settings.addWidget(self.abs_checkbox)
+    layout_abs_settings.addWidget(self.abs_from_line)
+    layout_abs_settings.addWidget(self.abs_label_to)
+    layout_abs_settings.addWidget(self.abs_to_line)
+    layout_abs_settings.addWidget(self.abs_label_unit)
+    layout_abs_settings.addStretch()
+    
+    layout_lin_settings.addWidget(self.lin_checkbox)
+    layout_lin_settings.addWidget(self.lin_from_line)
+    layout_lin_settings.addWidget(self.lin_label_to)
+    layout_lin_settings.addWidget(self.lin_to_line)
+    layout_lin_settings.addWidget(self.lin_label_step)
+    layout_lin_settings.addWidget(self.lin_step_line)
+    layout_lin_settings.addWidget(self.lin_label_unit)
+    layout_lin_settings.addStretch()
+    
+
+    layout_lin_settings.addWidget(self.lin_checkbox)
+
+    self.settings_window.setLayout(layout_modeling_settings)
+    layout_modeling_settings.addLayout(layout_abs_settings)
+    layout_modeling_settings.addLayout(layout_lin_settings)
+    self.layout_main.addWidget(self.settings_window)
+
+  def init_bottom_buttons(self):
+    layout_modeling_button = pya.QHBoxLayout(self)
+    layout_modeling_button.addStretch()
+
+    self.modeling_button = pya.QPushButton("Моделирование", self)
+    self.modeling_button.setMinimumHeight(27)
+    self.modeling_button.setMinimumWidth(150)
+    self.modeling_button.clicked(self.on_modeling_button)
+
+    layout_modeling_button.addWidget(self.modeling_button)
+    
+    self.layout_main.addLayout(layout_modeling_button)
+    
+  def init_cell_size(self):
+    layout_box_settings = pya.QVBoxLayout(self)
+
+    layout_xcell_settings = pya.QHBoxLayout(self)
+    layout_ycell_settings = pya.QHBoxLayout(self)
+
+    self.settings_window = pya.QGroupBox("Настройки размера ячеек", self)
+    
+    
+    double_validator = pya.QDoubleValidator(self)
+    double_validator.setNotation(pya.QDoubleValidator.StandardNotation)
+    double_validator.setBottom(1)
+    double_validator.setDecimals(4)
+    
+    self.xcell_label = pya.QLabel("Размер ячейки по X", self)
+    self.xcell_from_line = pya.QLineEdit(self)
+    self.xcell_label_unit = pya.QLabel("мкм", self)
+    self.xcell_from_line.setValidator(double_validator)
+    self.xcell_from_line.setMaximumWidth(50)
+    
+    self.ycell_label = pya.QLabel("Размер ячейки по Y", self)
+    self.ycell_from_line = pya.QLineEdit(self)
+    self.ycell_label_unit = pya.QLabel("мкм", self)
+    self.ycell_from_line.setValidator(double_validator)
+    self.ycell_from_line.setMaximumWidth(50)
+    
+    
+    layout_xcell_settings.addWidget(self.xcell_label)
+    layout_xcell_settings.addWidget(self.xcell_from_line)
+    layout_xcell_settings.addWidget(self.xcell_label_unit)
+    layout_xcell_settings.addStretch()
+    
+    layout_ycell_settings.addWidget(self.ycell_label)
+    layout_ycell_settings.addWidget(self.ycell_from_line)
+    layout_ycell_settings.addWidget(self.ycell_label_unit)
+    layout_ycell_settings.addStretch()
+
+    self.settings_window.setLayout(layout_box_settings)
+    layout_box_settings.addLayout(layout_xcell_settings)
+    layout_box_settings.addLayout(layout_ycell_settings)
+    self.layout_main.addWidget(self.settings_window)
+    
+# Методы сигналов    
+  def on_find_sonnet_button(self):
+    self.path_to_sonnet_line.text = Detective.file_processing()
+    
+  def on_modeling_button(self):
+    layout_name = pya.CellView().active().name
+    if self.create_son(layout_name) == False:
+      return False
+
+    bat_modeling = BatModeling(layout_name, "\EM", self.path_to_sonnet_line.text)
+    bat_modeling.create_file()
+    self.save_settings()
+    
+  def on_open_action(self):
+    str = pya.QFileDialog.getOpenFileName(self, "Выбрать файл", "/", "Результаты моделирования (*.s**p)")
+    _, file_extension = os.path.splitext(str)
+    regex_num = re.compile("\d+")
+    num_ports = regex_num.findall(file_extension)
+
+    plot_dialog = PlotDialog(int(num_ports[0]), str, pya.Application.instance().main_window()) 
+    plot_dialog.show()
+    plot_dialog.exec_()
+    
+  def on_create_action(self):
+    layout_name = pya.CellView().active().name 
+    self.create_son(layout_name)
+    self.save_settings()
+    
+  def on_exit_action(self):
+     self.close()
+
+# Методы настроек
+  def save_settings(self):
+    settings = configparser.ConfigParser()
+
+    settings["ABS"] = {
+      "abs_checkbox" : self.abs_checkbox.isChecked(),
+      "abs_from_line" : self.abs_from_line.text,
+      "abs_to_line" : self.abs_to_line.text
+    }
+
+    settings["LIN"] = {
+      "lin_checkbox" : self.lin_checkbox.isChecked(),
+      "lin_from_line" : self.lin_from_line.text,
+      "lin_to_line" : self.lin_to_line.text,
+      "lin_step_line" : self.lin_step_line.text
+    }
+
+    settings["CELL"] = {
+      "xcell_from_line" : self.xcell_from_line.text,
+      "ycell_from_line" : self.ycell_from_line.text
+    }
+
+    with open(f"{RAW_PATH_TO_KLAYOUT}\EM\config.ini", "w") as setting_file:
+      settings.write(setting_file)
+  
+  def load_settings(self):
+    settings = configparser.ConfigParser()
+    settings.read(f"{RAW_PATH_TO_KLAYOUT}\EM\config.ini")
+
+    if "ABS" in settings:
+        abs_settings = settings["ABS"]
+        if abs_settings.getboolean("abs_checkbox"):
+            self.abs_checkbox.setChecked(True)
+            self.abs_from_line.setText(abs_settings.get("abs_from_line", ""))
+            self.abs_to_line.setText(abs_settings.get("abs_to_line", ""))
+
+    if "LIN" in settings:
+        lin_settings = settings["LIN"]
+        if lin_settings.getboolean("lin_checkbox"):
+            self.lin_checkbox.setChecked(True)
+            self.lin_from_line.setText(lin_settings.get("lin_from_line", ""))
+            self.lin_to_line.setText(lin_settings.get("lin_to_line", ""))
+            self.lin_step_line.setText(lin_settings.get("lin_step_line", ""))
+
+    if "CELL" in settings:
+        cell_settings = settings["CELL"]
+        self.xcell_from_line.setText(cell_settings.get("xcell_from_line", ""))
+        self.ycell_from_line.setText(cell_settings.get("ycell_from_line", ""))
+
+# Методы обработки ошибок   
+  def check_find_line(self):
+    if len(self.path_to_sonnet_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка Sonnet")
+      error_msg.setText("Необходимо ввести путь до Sonnet!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_abs_lines(self):
+    if len(self.abs_from_line.text) == 0 or len(self.abs_to_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных ABS!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_lin_lines(self):
+    if len(self.lin_from_line.text) == 0 or len(self.lin_to_line.text) == 0 or len(self.lin_step_line.text) == 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных LIN!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_checkboxes(self):
+    if self.abs_checkbox.isChecked() == False and self.lin_checkbox.isChecked() == False:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо выбрать хотя бы один тип развертки!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+
+  def check_layout(self):
+    if (str(pya.CellView().active().layout()) == 'None'):
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка макета")
+      error_msg.setText("Необходимо создать \"Layout\"!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+      
+  def check_box_settings(self):
+    if len(self.xcell_from_line.text) == 0 or len(self.ycell_from_line.text) == 0 or float(self.xcell_from_line.text.replace(',','.')) &lt;= 0 or float(self.ycell_from_line.text.replace(',','.')) &lt;= 0:
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Ошибка настроек")
+      error_msg.setText("Необходимо проверить корректность данных размеров ячеек!")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.exec_()
+      return False
+    
+  def check_existence(self):
+    layout_name = pya.CellView().active().name
+    RAW_PATH_TO_KLAYOUT = r"{}".format(os.getcwd())
+
+    cur_dir_path = RAW_PATH_TO_KLAYOUT + rf"\EM\{layout_name}"
+
+    if os.path.exists(cur_dir_path):
+      error_msg = pya.QMessageBox()
+      error_msg.setWindowTitle("Предупреждение")
+      error_msg.setText("Директория с данным именем уже существует, перезаписать её?")
+      error_msg.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\warning.png"))
+      error_msg.setStandardButtons(pya.QMessageBox.Ok | pya.QMessageBox.Cancel)
+      return_value = error_msg.exec_()
+
+      if return_value == pya.QMessageBox.Ok:
+        shutil.rmtree(cur_dir_path)
+        return True
+      else:
+        return False
+  
+# Создание Sonnet
+  def create_son(self, layout_name):
+    if self.check_find_line() == False:
+      return False
+    if self.check_layout() == False:
+      return False
+    if self.check_checkboxes() == False:
+      return False
+    if self.abs_checkbox.isChecked():
+      if self.check_abs_lines() == False:
+        return False
+    if self.lin_checkbox.isChecked():
+      if self.check_lin_lines() == False:
+        return False
+    if self.check_box_settings() == False:
+      return False
+    if self.check_existence() == False:
+      return False 
+
+    proj = SonnetProject(layout_name, 
+     self.abs_checkbox.isChecked(), self.abs_from_line.text, self.abs_to_line.text, 
+     self.lin_checkbox.isChecked(), self.lin_from_line.text, self.lin_to_line.text, 
+     self.lin_step_line.text, self.xcell_from_line.text, self.ycell_from_line.text)
+     
+    proj.create_son_proj()
+
+class PlotDialog(pya.QDialog):
+  def __init__(self, num_ports, path, parent = None):
+    super().__init__()
+    self.num_ports = num_ports
+    self.path = path
+    self.format_text = "DB"
+
+    self.init_ui()
+
+  def init_ui(self):
+    self.setWindowTitle("Построение графиков")
+    self.setWindowIcon(pya.QIcon(r"salt\SVR_pHEMT025D\images\plot.png"))
+    self.setWindowFlags(pya.Qt_WindowType.WindowCloseButtonHint)
+    self.setFixedSize(200, 140)
+    
+    self.layout_main = pya.QVBoxLayout(self)
+    self.layout_main.setContentsMargins(10, 10, 10, 10)
+
+    self.init_plot_settings()
+
+  def init_plot_settings(self):
+    layout_settings = pya.QVBoxLayout(self)
+
+    layout_ports_settings = pya.QHBoxLayout(self)
+    layout_format_settings = pya.QHBoxLayout(self)
+    layout_plot_button = pya.QHBoxLayout(self)
+    self.settings_window = pya.QGroupBox("Настройки отображения", self)
+    
+    i = self.num_ports
+
+    self.from_port_label = pya.QLabel("Порты:   из", self)
+    self.from_port = pya.QComboBox()
+    self.from_port.setMinimumWidth(40)
+    self.from_port.currentIndexChanged(self.from_handle_current_index)
+    
+    self.to_port_label = pya.QLabel("в", self)
+    self.to_port = pya.QComboBox()
+    self.to_port.setMinimumWidth(40)
+    self.to_port.currentIndexChanged(self.to_handle_current_index)
+
+    while i &gt; 0:
+      self.from_port.addItem(f"{i}")
+      self.to_port.addItem(f"{i}")
+      i -= 1
+
+    self.format_label = pya.QLabel("Формат:     ", self)
+    self.format = pya.QComboBox(self)
+    self.format.addItems(["DB", "MAG", "ANG", "RAD", "RE", "IM"])
+    self.format.setMinimumWidth(40)
+    self.format.currentIndexChanged(self.format_handle_current_index)
+
+    layout_ports_settings.addWidget(self.from_port_label)
+    layout_ports_settings.addWidget(self.from_port)
+    layout_ports_settings.addWidget(self.to_port_label)
+    layout_ports_settings.addWidget(self.to_port)
+    layout_ports_settings.addStretch()
+
+    layout_format_settings.addWidget(self.format_label)
+    layout_format_settings.addWidget(self.format)
+    layout_format_settings.addStretch()
+
+    self.plot_button = pya.QPushButton("Построить график", self)
+    self.plot_button.setMinimumHeight(27)
+    self.plot_button.setMinimumWidth(150)
+    self.plot_button.clicked(self.on_plot_button)
+
+    layout_settings.addLayout(layout_ports_settings)
+    layout_settings.addLayout(layout_format_settings)
+
+    self.settings_window.setLayout(layout_settings)
+
+    layout_plot_button.addStretch(1)
+    layout_plot_button.addWidget(self.plot_button)
+    
+    self.layout_main.addWidget(self.settings_window)
+    self.layout_main.addLayout(layout_plot_button)
+
+  def to_handle_current_index(self, index):
+    self.to_port_text = self.to_port.itemText(index)  
+  
+  def from_handle_current_index(self, index):
+    self.from_port_text = self.from_port.itemText(index)
+
+  def format_handle_current_index(self, index):
+    self.format_text = self.format.itemText(index)
+
+  def on_plot_button(self):
+    gnuplot_path = f"{RAW_PATH_TO_KLAYOUT}/gnuplot/bin/gnuplot.exe"
+    self.process = pya.QProcess(self)
+    env = pya.QProcessEnvironment.systemEnvironment()
+    self.process.setProcessEnvironment(env)
+    self.process.start(gnuplot_path, ["-p"])
+
+    plot = Touchstone(self.path, self.from_port_text, self.to_port_text, self.format_text, self.process)
+    plot.create_plot()
+
+def f():
+  dialog = EMDialog(pya.Application.instance().main_window()).instance()
+  dialog.show()
+  dialog.exec_()
+
+# Добавление нового пунтка меню в KLayout
+a = pya.Action()
+a.title = "Электромагнитное моделирование"
+a.icon = r"salt\SVR_pHEMT025D\images\logo-01.png"
+a.icon_text = "EM-menu"
+a.on_triggered(f)
+  
+menu = pya.Application.instance().main_window().menu()
+menu.insert_separator("@toolbar.end", "name")
+menu.insert_item("@toolbar.end", "my_action", a)
+</text>
+</klayout-macro>

@@ -1,1 +1,0 @@
-# niimes-tech

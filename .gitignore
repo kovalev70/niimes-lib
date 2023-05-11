@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/SVR_pHEMT025D_VS/.vs/SVR_pHEMT025D/v17
+/SVR_pHEMT025D_VS/EM
+/SVR_pHEMT025D_VS/.vs/SVR_pHEMT025D/v16/*.suo
+/_Install/Output
